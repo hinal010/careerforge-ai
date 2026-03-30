@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Institutes | CareerForge AI</title>
+  <link rel="stylesheet" href="/static/admin/admin_panel.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="admin-container">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+          <h2 class="brand-logo">
+              <span class="brand-blue">Career</span>Forge AI
+          </h2>
+          <p>Admin Panel</p>
+      </div>
+      <nav class="sidebar-menu">
+                <a href="/admin/dashboard" class="active">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
+                <a href="/admin/users">
+                    <i class="fa-solid fa-users"></i> Users
+                </a>
+                <a href="/admin/degrees">
+                    <i class="fa-solid fa-graduation-cap"></i> Degrees
+                </a>
+                <a href="/admin/courses">
+                    <i class="fa-solid fa-book"></i> Courses
+                </a>
+                <a href="/admin/institutes">
+                    <i class="fa-solid fa-building-columns"></i> Institutes
+                </a>
+                <a href="/admin/experience-types">
+                    <i class="fa-solid fa-user-clock"></i> Experience Types
+                </a>
+                <a href="/admin/job-titles">
+                    <i class="fa-solid fa-briefcase"></i> Job Titles
+                </a>
+                 <a href="/">
+                        <i class="fa-solid fa-house"></i> Go to Main Site
+                </a>
+                <a href="/admin/logout" class="logout-link">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Manage Institutes</h1>
+        <p>Add and manage institute master data</p>
+      </div>
+
+      <div class="panel-card form-card">
+        <h2>{% if edit_institute %}Edit Institute{% else %}Add Institute{% endif %}</h2>
+        <form action="/admin/institutes/add" method="post">
+          <input type="hidden" name="institute_id" value="{{ edit_institute[0] if edit_institute else '' }}">
+
+          <div class="form-group">
+            <label>Select Course</label>
+            <select name="course_id" required>
+              <option value="">Select Course</option>
+              {% if courses %}
+                {% for course in courses %}
+                <option value="{{ course[0] }}"
+                  {% if edit_institute and edit_institute[1] == course[0] %}selected{% endif %}>
+                  {{ course[1] }}
+                </option>
+                {% endfor %}
+              {% endif %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Institute Name</label>
+            <input
+              type="text"
+              name="institute_name"
+              placeholder="Enter institute name"
+              value="{{ edit_institute[2] if edit_institute else '' }}"
+              required
+            >
+          </div>
+
+          <button type="submit" class="primary-btn">
+            {% if edit_institute %}Update Institute{% else %}Add Institute{% endif %}
+          </button>
+
+          {% if edit_institute %}
+            <a href="/admin/institutes" class="action-link">Cancel</a>
+          {% endif %}
+        </form>
+      </div>
+
+      <div class="panel-card">
+        <h2>All Institutes</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Institute Name</th>
+              <th>Course</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if institutes %}
+              {% for institute in institutes %}
+              <tr>
+                <td>{{ institute[0] }}</td>
+                <td>{{ institute[1] }}</td>
+                <td>{{ institute[3] }}</td>
+                <td>
+                  <a href="/admin/institutes?edit_id={{ institute[0] }}" class="action-link">Edit</a>
+                  <a href="/admin/institutes/delete/{{ institute[0] }}"
+                     class="action-link danger-link"
+                     onclick="return confirm('Are you sure you want to delete this institute?')">
+                    Delete
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="4">No institutes found</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

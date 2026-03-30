@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | CareerForge AI</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/login.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo"><span>Career</span>Forge AI</div>
+
+  </nav>
+
+  <!-- LOGIN SECTION -->
+  <main class="login-wrapper">
+    <div class="login-card">
+      <h1 class="login-title">Welcome back! Please log in above</h1>
+      <!-- Google button -->
+      <a href="/auth/google" class="social-btn google-btn">
+        <img src="/static/google.png" class="google-icon">
+        <span>Continue with Google</span>
+      </a>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span></span>
+        <p>OR</p>
+        <span></span>
+      </div>
+
+      <!-- Form -->
+      <form action="/login" method="post" class="login-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="Enter email" required>
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+
+            <input type="password" name="password" placeholder="Enter password" required>
+
+            <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="login-btn">Log In</button>
+      </form>
+
+      <p class="register-text">
+        Don’t have an account?
+        <a href="/register">Register</a>
+      </p>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-left">
+      © 2026 CareerForge AI. All rights reserved.
+    </div>
+    <div class="footer-right">
+      <a href="#">Terms & Conditions</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Cookie Policy</a>
+      <a href="#">Contact us</a>
+    </div>
+  </footer>
+
+</body>
+</html>

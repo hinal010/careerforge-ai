@@ -1,0 +1,141 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #f5f4f0;
+  --white: #ffffff;
+  --ink: #0f0e0b;
+  --ink-soft: #4a4845;
+  --ink-muted: #8a8784;
+  --accent: #2563eb;
+  --border: #e5e3de;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* NAVBAR */
+.navbar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 48px;
+  height: 64px;
+  background: rgba(245,244,240,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+
+.logo span {
+  color: var(--accent);
+}
+
+/* WRAPPER */
+.register-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* CARD */
+.register-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+}
+
+/* TITLE */
+.register-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* FORM */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-group label {
+  font-size: 13px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* BUTTON */
+.register-btn {
+  margin-top: 10px;
+  padding: 11px;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* LOGIN TEXT */
+.login-text {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 15px;
+}
+
+.login-text a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* FOOTER */
+.footer {
+  padding: 14px 40px;
+  border-top: 1px solid var(--border);
+  background: var(--white);
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.footer-right {
+  display: flex;
+  gap: 12px;
+}
+
+.footer-right a {
+  text-decoration: none;
+  color: var(--accent);
+}

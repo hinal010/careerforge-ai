@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Experience Types</title>
+    <link rel="stylesheet" href="/static/admin/admin_panel.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+<div class="admin-layout">
+
+    <aside class="sidebar">
+       <div class="sidebar-top">
+            <h2 class="brand-logo">
+                <span class="brand-blue">Career</span>Forge AI
+            </h2>
+            <p>Admin Panel</p>
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="/admin/dashboard">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </a>
+            <a href="/admin/users">
+                <i class="fa-solid fa-users"></i> Users
+            </a>
+            <a href="/admin/degrees">
+                <i class="fa-solid fa-graduation-cap"></i> Degrees
+            </a>
+            <a href="/admin/courses">
+                <i class="fa-solid fa-book"></i> Courses
+            </a>
+            <a href="/admin/institutes">
+                <i class="fa-solid fa-building-columns"></i> Institutes
+            </a>
+            <a href="/admin/job-titles">
+                <i class="fa-solid fa-briefcase"></i> Job Titles
+            </a>
+            <a href="/admin/experience-types" class="active">
+                <i class="fa-solid fa-user-clock"></i> Experience Types
+            </a>
+            <a href="/">
+                <i class="fa-solid fa-house"></i> Go to Main Site
+            </a>
+            <a href="/admin/logout" class="logout-link">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="topbar">
+            <div>
+                <h1>Experience Types</h1>
+                <p>Manage the experience types shown in the experience form.</p>
+            </div>
+        </div>
+
+        <div class="panel-card form-card">
+            <h2>{% if edit_experience_type %}Edit Experience Type{% else %}Add Experience Type{% endif %}</h2>
+
+            <form action="/admin/experience-types/add" method="post" class="admin-form">
+                <input type="hidden" name="type_id" value="{{ edit_experience_type.id if edit_experience_type else '' }}">
+
+                <div class="form-group">
+                    <label for="type_name">Experience Type Name</label>
+                    <input
+                        type="text"
+                        id="type_name"
+                        name="type_name"
+                        placeholder="Enter experience type"
+                        value="{{ edit_experience_type.type_name if edit_experience_type else '' }}"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="primary-btn">
+                    {% if edit_experience_type %}Update Experience Type{% else %} Add Experience Type{% endif %}
+                </button>
+            </form>
+        </div>
+
+        <div class="panel-card">
+            <div class="card-header">
+                <h2>All Experience Types</h2>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Experience Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exp in experience_types %}
+                        <tr>
+                            <td>{{ exp.id }}</td>
+                            <td>{{ exp.type_name }}</td>
+                            <td class="action-cell">
+                                <a href="/admin/experience-types?edit_id={{ exp.id }}" class="action-link">Edit</a>
+                                <a href="/admin/experience-types/delete/{{ exp.id }}"
+                                   class="action-link danger-link"
+                                   onclick="return confirm('Delete this experience type?')">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="empty-text">No experience types found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

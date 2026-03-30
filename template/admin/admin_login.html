@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login | CareerForge AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/static/admin/admin_login.css" />
+</head>
+<body>
+
+  <main class="login-wrapper">
+    <div class="login-card admin-card">
+      <div class="sidebar-top">
+    <h2 class="brand-logo">
+        <span class="brand-blue">Career</span>Forge AI
+    </h2>
+    <p>Admin Panel</p>
+</div>
+
+      <h2 class="login-title">Admin Sign In</h2>
+      <p class="admin-subtitle">Login to manage masters, users, and dashboard data</p>
+
+      {% if error %}
+      <div class="alert error">{{ error }}</div>
+      {% endif %}
+
+      {% if success %}
+      <div class="alert success">{{ success }}</div>
+      {% endif %}
+
+      <form action="/admin/login" method="post" class="login-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter admin email"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter password"
+            required
+          />
+        </div>
+
+        <button type="submit" class="login-btn">Login to Dashboard</button>
+      </form>
+
+      <p class="register-text">
+        Back to <a href="/">Main Site</a>
+      </p>
+    </div>
+  </main>
+
+</body>
+</html>

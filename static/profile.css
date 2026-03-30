@@ -1,0 +1,358 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --border: #e6e1d9;
+}
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f5f4f0;
+    color: #1e293b;
+}
+
+.page-wrapper {
+    min-height: 100vh;
+}
+
+/* Topbar */
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    height: 64px;
+    background: rgba(245, 244, 240, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+}
+
+.logo {
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    letter-spacing: -0.5px;
+    color: #0f0e0b;
+}
+
+.logo span {
+    color: #2563eb;
+}
+
+/* Progress Section */
+.progress-section {
+    background: #ffffff;
+    border-bottom: 1px solid #e5edf5;
+    padding: 24px 40px 30px;
+}
+
+.progress-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+}
+
+.progress-wrap::before {
+    content: "";
+    position: absolute;
+    top: 34px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #d9e3ef;
+    z-index: 0;
+}
+
+.progress-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.step-label {
+    display: block;
+    margin-bottom: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+.step-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    display: inline-block;
+    position: relative;
+}
+
+/* Active Step */
+.progress-step.active .step-label {
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.progress-step.active .step-dot {
+    border-color: #2563eb;
+    background: #ffffff;
+}
+
+.progress-step.active .step-dot::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: #60a5fa;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+}
+
+/* Completed Step */
+.progress-step.completed .step-label {
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.progress-step.completed .step-dot {
+    border-color: #2563eb;
+    background: #ffffff;
+}
+
+.progress-step.completed .step-dot::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: #60a5fa;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+}
+
+/* Form Area */
+.form-container {
+    padding: 40px 20px 60px;
+}
+
+.form-card {
+    max-width: 950px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+    padding: 40px;
+}
+
+.form-header {
+    margin-bottom: 30px;
+}
+
+.form-header h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: #0f172a;
+}
+
+.form-header p {
+    font-size: 15px;
+    color: #64748b;
+}
+
+/* Photo Section */
+.photo-section {
+    margin-bottom: 30px;
+}
+
+.field-label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.photo-upload-box {
+    border: 2px dashed #cbd5e1;
+    border-radius: 18px;
+    background: #f8fbff;
+    padding: 24px;
+    text-align: center;
+}
+
+.photo-preview-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 170px;
+    margin-bottom: 18px;
+}
+
+#preview {
+    display: none;
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #dbeafe;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+}
+
+.photo-placeholder {
+    color: #64748b;
+}
+
+.upload-icon {
+    display: block;
+    font-size: 34px;
+    margin-bottom: 10px;
+}
+
+.photo-placeholder p {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #334155;
+}
+
+.photo-placeholder small {
+    color: #94a3b8;
+}
+
+.photo-upload-action input[type="file"] {
+    display: none;
+}
+
+.upload-btn {
+    display: inline-block;
+    background: #e0edff;
+    color: #1d4ed8;
+    font-weight: 600;
+    padding: 12px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.upload-btn:hover {
+    background: #cfe2ff;
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #d9e3ef;
+    border-radius: 12px;
+    font-size: 15px;
+    background: #ffffff;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
+}
+
+/* Button */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+.continue-btn {
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.continue-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .progress-wrap {
+        gap: 12px;
+    }
+
+    .step-label {
+        font-size: 13px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 700px) {
+    .topbar,
+    .progress-section {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .form-card {
+        padding: 24px;
+        border-radius: 16px;
+    }
+
+    .form-header h1 {
+        font-size: 26px;
+    }
+
+    .progress-wrap {
+        overflow-x: auto;
+        gap: 24px;
+        padding-bottom: 10px;
+    }
+
+    .progress-step {
+        min-width: 110px;
+    }
+}

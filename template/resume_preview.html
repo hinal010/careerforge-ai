@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Preview | CareerForge AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/resume_preview.css">
+</head>
+<body>
+
+    <div class="page-wrapper">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="logo"><span>Career</span>Forge AI</div>
+
+            <div class="topbar-actions">
+                <a href="/choose_template" class="back-link">← Back to Templates</a>
+            </div>
+        </header>
+
+        <!-- Preview Header -->
+        <section class="preview-header">
+            <div class="preview-header-left">
+                <p class="preview-badge">Resume Preview</p>
+                <h1>Your Resume Template Preview</h1>
+                <p class="preview-subtext">
+                    Review how your resume looks in the selected template before finalizing it.
+                </p>
+            </div>
+
+            <div class="preview-header-right">
+                <div class="selected-template-box">
+                    <span class="selected-label">Selected Template</span>
+                    <strong id="selectedTemplateName">
+                        {{ selected_template_name if selected_template_name else "classic-edge" }}
+                    </strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Preview Actions -->
+        <section class="preview-actions-bar">
+            <button type="button" class="secondary-btn" onclick="window.location.href='/choose_template'">
+                Change Template
+            </button>
+            <button type="button" class="primary-btn" onclick="selectCurrentTemplate()">
+                Use This Template
+            </button>
+        </section>
+
+        <!-- Resume Preview -->
+        <main class="preview-main">
+            <div class="resume-shell">
+                <div class="resume-paper template-{{ selected_template_name if selected_template_name else 'classic-edge' }}" id="resumePaper">
+
+                    <!-- Resume Header -->
+                    <div class="resume-header">
+                        <div>
+                            <h1 class="resume-name">
+                                {{ profile.full_name if profile and profile.full_name else "Your Name" }}
+                            </h1>
+                            <p class="resume-role">
+                                {% if skills and skills.job_role_text %}
+                                    {{ skills.job_role_text }}
+                                {% else %}
+                                    Target Role
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div class="resume-contact">
+                            {% if profile and profile.location %}
+                                <p>{{ profile.location }}{% if profile.country %}, {{ profile.country }}{% endif %}</p>
+                            {% elif profile and profile.country %}
+                                <p>{{ profile.country }}</p>
+                            {% endif %}
+
+                            {% if profile and profile.email %}
+                                <p>{{ profile.email }}</p>
+                            {% endif %}
+
+                            {% if profile and profile.contact %}
+                                <p>{{ profile.contact }}</p>
+                            {% endif %}
+
+                            {% if profile and profile.linkedin %}
+                                <p>{{ profile.linkedin }}</p>
+                            {% endif %}
+
+                            {% if profile and profile.github %}
+                                <p>{{ profile.github }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Professional Summary -->
+                    {% if saved_summary %}
+                    <section class="resume-section">
+                        <h2>Professional Summary</h2>
+                        <p>{{ saved_summary }}</p>
+                    </section>
+                    {% endif %}
+
+                    <!-- Education -->
+                    {% if educations and educations|length > 0 %}
+                    <section class="resume-section">
+                        <h2>Education</h2>
+
+                        {% for edu in educations %}
+                        <div class="resume-block">
+                            <div class="block-top">
+                                <div>
+                                    <h3>
+                                        {{ edu.course_text if edu.course_text else edu.course_name if edu.course_name else "Course" }}
+                                    </h3>
+                                    <p class="sub-line">
+                                        {% if edu.degree_text %}
+                                            {{ edu.degree_text }}
+                                        {% elif edu.degree_name %}
+                                            {{ edu.degree_name }}
+                                        {% endif %}
+                                        {% if (edu.degree_text or edu.degree_name) and (edu.institution_text or edu.institute_name) %}
+                                            •
+                                        {% endif %}
+                                        {{ edu.institution_text if edu.institution_text else edu.institute_name if edu.institute_name else "Institution" }}
+                                    </p>
+                                </div>
+                                <span class="date-line">
+                                    {{ edu.start_month if edu.start_month else "" }}
+                                    {% if edu.start_month or edu.end_month %}
+                                        -
+                                    {% endif %}
+                                    {{ edu.end_month if edu.end_month else "Present" }}
+                                </span>
+                            </div>
+
+                            <p class="muted-line">
+                                {% if edu.location %}{{ edu.location }}{% endif %}
+                                {% if edu.location and edu.grade %} • {% endif %}
+                                {% if edu.grade %}Grade: {{ edu.grade }}{% endif %}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </section>
+                    {% endif %}
+
+                    <!-- Experience -->
+                    {% if experiences and experiences|length > 0 %}
+                    <section class="resume-section">
+                        <h2>Experience</h2>
+
+                        {% for exp in experiences %}
+                        <div class="resume-block">
+                            <div class="block-top">
+                                <div>
+                                    <h3>
+                                        {% if exp.job_title_text %}
+                                            {{ exp.job_title_text }}
+                                        {% elif exp.job_title_name %}
+                                            {{ exp.job_title_name }}
+                                        {% elif exp.custom_job_title %}
+                                            {{ exp.custom_job_title }}
+                                        {% else %}
+                                            Job Title
+                                        {% endif %}
+                                    </h3>
+                                    <p class="sub-line">
+                                        {{ exp.company_name if exp.company_name else "Company" }}
+                                        {% if exp.experience_type_text %}
+                                            • {{ exp.experience_type_text }}
+                                        {% elif exp.experience_type_name %}
+                                            • {{ exp.experience_type_name }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <span class="date-line">
+                                    {{ exp.start_month if exp.start_month else "" }}
+                                    {% if exp.start_month or exp.end_month or exp.currently_working %}
+                                        -
+                                    {% endif %}
+                                    {% if exp.currently_working %}
+                                        Present
+                                    {% else %}
+                                        {{ exp.end_month if exp.end_month else "Present" }}
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                            {% if exp.location %}
+                                <p class="muted-line">{{ exp.location }}</p>
+                            {% endif %}
+
+                            {% if exp.description %}
+                                <ul>
+                                    {% for line in exp.description.split('\n') %}
+                                        {% if line.strip() %}
+                                            <li>{{ line.strip() }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </section>
+                    {% endif %}
+
+                    <!-- Projects -->
+                    {% if projects and projects|length > 0 %}
+                    <section class="resume-section">
+                        <h2>Projects</h2>
+
+                        {% for project in projects %}
+                        <div class="resume-block">
+                            <div class="block-top">
+                                <div>
+                                    <h3>{{ project.project_title }}</h3>
+                                    {% if project.technologies %}
+                                        <p class="sub-line">{{ project.technologies }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if project.description %}
+                                <ul>
+                                    {% for line in project.description.split('\n') %}
+                                        {% if line.strip() %}
+                                            <li>{{ line.strip() }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </section>
+                    {% endif %}
+
+                    <!-- Skills -->
+                    {% if skills %}
+                    <section class="resume-section">
+                        <h2>Skills</h2>
+                        <div class="skills-preview-grid">
+                            {% if skills.languages %}
+                                <div><strong>Languages:</strong> {{ skills.languages }}</div>
+                            {% endif %}
+                            {% if skills.frameworks %}
+                                <div><strong>Frameworks:</strong> {{ skills.frameworks }}</div>
+                            {% endif %}
+                            {% if skills.tools %}
+                                <div><strong>Tools:</strong> {{ skills.tools }}</div>
+                            {% endif %}
+                            {% if skills.cloud_platforms %}
+                                <div><strong>Cloud Platforms:</strong> {{ skills.cloud_platforms }}</div>
+                            {% endif %}
+                            {% if skills.databases %}
+                                <div><strong>Databases:</strong> {{ skills.databases }}</div>
+                            {% endif %}
+                            {% if skills.methodologies %}
+                                <div><strong>Methodologies:</strong> {{ skills.methodologies }}</div>
+                            {% endif %}
+                            {% if skills.soft_skills %}
+                                <div><strong>Soft Skills:</strong> {{ skills.soft_skills }}</div>
+                            {% endif %}
+                        </div>
+                    </section>
+                    {% endif %}
+
+                    <!-- Certifications -->
+                    {% if certifications and certifications|length > 0 %}
+                    <section class="resume-section">
+                        <h2>Certifications</h2>
+
+                        {% for cert in certifications %}
+                        <div class="resume-block">
+                            <div class="block-top">
+                                <div>
+                                    <h3>{{ cert.certificate_name }}</h3>
+                                    <p class="sub-line">{{ cert.organization }}</p>
+                                </div>
+                                <span class="date-line">{{ cert.certificate_date }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </section>
+                    {% endif %}
+
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        const templateId = "{{ selected_template_name if selected_template_name else 'classic-edge' }}";
+
+        function selectCurrentTemplate() {
+            window.location.href = `/resume_preview?template=${templateId}&selected=true`;
+        }
+    </script>
+
+</body>
+</html>

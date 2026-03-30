@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Detail | CareerForge AI</title>
+  <link rel="stylesheet" href="/static/admin/admin_panel.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="admin-container">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+          <h2 class="brand-logo">
+              <span class="brand-blue">Career</span>Forge AI
+          </h2>
+          <p>Admin Panel</p>
+      </div>
+      <nav class="sidebar-menu">
+                <a href="/admin/dashboard" class="active">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
+                <a href="/admin/users">
+                    <i class="fa-solid fa-users"></i> Users
+                </a>
+                <a href="/admin/degrees">
+                    <i class="fa-solid fa-graduation-cap"></i> Degrees
+                </a>
+                <a href="/admin/courses">
+                    <i class="fa-solid fa-book"></i> Courses
+                </a>
+                <a href="/admin/institutes">
+                    <i class="fa-solid fa-building-columns"></i> Institutes
+                </a>
+                <a href="/admin/experience-types">
+                    <i class="fa-solid fa-user-clock"></i> Experience Types
+                </a>
+                <a href="/admin/job-titles">
+                    <i class="fa-solid fa-briefcase"></i> Job Titles
+                </a>
+                 <a href="/">
+                        <i class="fa-solid fa-house"></i> Go to Main Site
+                </a>
+                <a href="/admin/logout" class="logout-link">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>User Detail</h1>
+        <p>Full information of selected user</p>
+      </div>
+
+      <div class="detail-grid">
+        <div class="panel-card">
+          <h2>Basic Info</h2>
+          <p><strong>Name:</strong> {{ user["full_name"] }}</p>
+          <p><strong>Email:</strong> {{ user["email"] }}</p>
+          <p><strong>Phone:</strong> {{ user["phone"] if user["phone"] else "-" }}</p>
+          <p><strong>Job Role:</strong> {{ user["job_role"] if user["job_role"] else "-" }}</p>
+          <p><strong>Status:</strong> {{ user["status"] }}</p>
+        </div>
+
+        <div class="panel-card">
+          <h2>Education</h2>
+          {% if education %}
+            {% for edu in education %}
+            <div class="detail-item">
+              <p><strong>Degree:</strong> {{ edu["degree_name"] }}</p>
+              <p><strong>Course:</strong> {{ edu["course_name"] }}</p>
+              <p><strong>Institute:</strong> {{ edu["institute_name"] }}</p>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p>No education data</p>
+          {% endif %}
+        </div>
+
+        <div class="panel-card">
+          <h2>Experience</h2>
+          {% if experiences %}
+            {% for exp in experiences %}
+            <div class="detail-item">
+              <p><strong>Company:</strong> {{ exp["company_name"] }}</p>
+              <p><strong>Role:</strong> {{ exp["job_title"] }}</p>
+              <p><strong>Years:</strong> {{ exp["start_date"] }} - {{ exp["end_date"] }}</p>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p>No experience data</p>
+          {% endif %}
+        </div>
+
+        <div class="panel-card">
+          <h2>Skills</h2>
+          {% if skills %}
+            <div class="tag-list">
+              {% for skill in skills %}
+              <span class="tag">{{ skill["skill_name"] }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p>No skills data</p>
+          {% endif %}
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

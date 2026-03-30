@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Users | CareerForge AI</title>
+  <link rel="stylesheet" href="/static/admin/admin_panel.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="admin-container">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+          <h2 class="brand-logo">
+              <span class="brand-blue">Career</span>Forge AI
+          </h2>
+          <p>Admin Panel</p>
+      </div>
+    <nav class="sidebar-menu">
+                <a href="/admin/dashboard" class="active">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
+                <a href="/admin/users">
+                    <i class="fa-solid fa-users"></i> Users
+                </a>
+                <a href="/admin/degrees">
+                    <i class="fa-solid fa-graduation-cap"></i> Degrees
+                </a>
+                <a href="/admin/courses">
+                    <i class="fa-solid fa-book"></i> Courses
+                </a>
+                <a href="/admin/institutes">
+                    <i class="fa-solid fa-building-columns"></i> Institutes
+                </a>
+                <a href="/admin/experience-types">
+                    <i class="fa-solid fa-user-clock"></i> Experience Types
+                </a>
+                <a href="/admin/job-titles">
+                    <i class="fa-solid fa-briefcase"></i> Job Titles
+                </a>
+                 <a href="/">
+                        <i class="fa-solid fa-house"></i> Go to Main Site
+                </a>
+                <a href="/admin/logout" class="logout-link">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Users</h1>
+        <p>View registered user data</p>
+      </div>
+
+      <div class="panel-card">
+        <form action="/admin/users" method="get" class="search-form">
+          <input type="text" name="q" placeholder="Search by name or email" value="{{ q if q else '' }}">
+          <button type="submit" class="primary-btn">Search</button>
+        </form>
+      </div>
+
+      <div class="panel-card">
+        <h2>All Users</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Job Role</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if users %}
+              {% for user in users %}
+              <tr>
+                <td>{{ user["id"] }}</td>
+                <td>{{ user["full_name"] }}</td>
+                <td>{{ user["email"] }}</td>
+                <td>{{ user["job_role"] if user["job_role"] else "Not Selected" }}</td>
+                <td>{{ user["status"] }}</td>
+                <td>
+                  <a href="/admin/users/{{ user['id'] }}" class="action-link">View</a>
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="6">No users found</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

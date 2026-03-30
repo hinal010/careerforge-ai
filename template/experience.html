@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experience | CareerForge AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/experience.css">
+</head>
+<body>
+
+    <div class="page-wrapper">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="logo"><span>Career</span>Forge AI</div>
+        </header>
+
+        <!-- Progress Bar -->
+        <section class="progress-section">
+    <div class="progress-wrap">
+
+        <div class="progress-step {% if step|default(0) > 1 %}completed{% elif step|default(0) == 1 %}active{% endif %}">
+            <span class="step-label">Profile</span>
+            <span class="step-dot"></span>
+        </div>
+
+        <div class="progress-step {% if step|default(0) > 2 %}completed{% elif step|default(0) == 2 %}active{% endif %}">
+            <span class="step-label">Education</span>
+            <span class="step-dot"></span>
+        </div>
+
+        <div class="progress-step {% if step|default(0) > 3 %}completed{% elif step|default(0) == 3 %}active{% endif %}">
+            <span class="step-label">Experience</span>
+            <span class="step-dot"></span>
+        </div>
+
+        <div class="progress-step {% if step|default(0) > 4 %}completed{% elif step|default(0) == 4 %}active{% endif %}">
+            <span class="step-label">Certification</span>
+            <span class="step-dot"></span>
+        </div>
+
+        <div class="progress-step {% if step|default(0) > 5 %}completed{% elif step|default(0) == 5 %}active{% endif %}">
+            <span class="step-label">Project</span>
+            <span class="step-dot"></span>
+        </div>
+
+        <div class="progress-step {% if step|default(0) > 6 %}completed{% elif step|default(0) == 6 %}active{% endif %}">
+            <span class="step-label">Skills</span>
+            <span class="step-dot"></span>
+        </div>
+
+        <div class="progress-step {% if step|default(0) > 7 %}completed{% elif step|default(0) == 7 %}active{% endif %}">
+            <span class="step-label">Summary</span>
+            <span class="step-dot"></span>
+        </div>
+
+    </div>
+</section>
+
+        <!-- Main Section -->
+        <main class="main-section">
+            <div class="experience-card">
+
+                <div class="card-header">
+                    <h1>Experience Details</h1>
+                    <p>Add your work experience below. You can add multiple experience records.</p>
+                </div>
+
+                <form id="experienceForm" class="experience-form" method="post" action="/experience_detail">
+                    <input type="hidden" name="experience_id" value="{{ edit_experience.id if edit_experience else '' }}">
+
+                    <div class="form-grid">
+
+                        <!-- Job Title -->
+                        <div class="form-group">
+                            <label for="job_title">Job Title</label>
+                            <select id="job_title" name="job_title" required>
+                                <option value="">Select Job Title</option>
+
+                                {% if job_title_list %}
+                                    {% for job in job_title_list %}
+                                        <option value="{{ job.id }}"
+                                            {% if edit_experience and edit_experience.job_title_id == job.id %}selected{% endif %}>
+                                            {{ job.job_title }}
+                                        </option>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <option value="other"
+                                    {% if edit_experience and edit_experience.custom_job_title %}selected{% endif %}>
+                                    Other
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Custom Job Title -->
+                        <div class="form-group {% if not (edit_experience and edit_experience.custom_job_title) %}hidden-field{% endif %}"
+                                id="customJobTitleGroup">
+                                <label for="custom_job_title">Custom Job Title</label>
+                                <input
+                                    type="text"
+                                    id="custom_job_title"
+                                    name="custom_job_title"
+                                    placeholder="Enter your custom job title"
+                                    value="{{ edit_experience.custom_job_title if edit_experience else '' }}"
+                                >
+                            </div>
+
+                        <!-- Experience Type -->
+                        <div class="form-group">
+                            <label for="experience_type">Experience Type</label>
+                            <select id="experience_type" name="experience_type" required>
+                                <option value="">Select Experience Type</option>
+
+                                {% if experience_type_list %}
+                                    {% for exp in experience_type_list %}
+                                        <option value="{{ exp.id }}"
+                                            {% if edit_experience and edit_experience.experience_type_id == exp.id %}selected{% endif %}>
+                                            {{ exp.type_name }}
+                                        </option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+
+                        <!-- Company -->
+                        <div class="form-group">
+                            <label for="company_name">Company Name</label>
+                            <input
+                                type="text"
+                                id="company_name"
+                                name="company_name"
+                                placeholder="Enter company name"
+                                value="{{ edit_experience.company_name if edit_experience else '' }}"
+                                required
+                            >
+                        </div>
+
+                        <!-- Location -->
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input
+                                type="text"
+                                id="location"
+                                name="location"
+                                placeholder="Enter company location"
+                                value="{{ edit_experience.location if edit_experience else '' }}"
+                            >
+                        </div>
+
+                        <!-- Start Month -->
+                        <div class="form-group">
+                            <label for="start_month">Start Month</label>
+                            <input
+                                type="month"
+                                id="start_month"
+                                name="start_month"
+                                value="{{ edit_experience.start_month if edit_experience else '' }}"
+                                required
+                            >
+                        </div>
+
+                        <!-- End Month -->
+                        <div class="form-group">
+                            <label for="end_month">End Month</label>
+                            <input
+                                type="month"
+                                id="end_month"
+                                name="end_month"
+                                value="{{ edit_experience.end_month if edit_experience else '' }}"
+                                {% if edit_experience and edit_experience.currently_working %}disabled{% endif %}
+                            >
+                        </div>
+
+                        <!-- Currently Working -->
+                        <div class="form-group full-width">
+                            <label class="checkbox-label">
+                                <input
+                                    type="checkbox"
+                                    id="currently_working"
+                                    name="currently_working"
+                                    {% if edit_experience and edit_experience.currently_working %}checked{% endif %}>
+                                <span>I am currently working here</span>
+                            </label>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group full-width">
+                            <label for="description">Description</label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                rows="6"
+                                placeholder="Example: Developed responsive web pages, fixed bugs, collaborated with backend team, improved performance, and worked on API integration."
+                            >{{ edit_experience.description if edit_experience else '' }}</textarea>
+
+                            <div class="ai-action">
+                                <button type="button" class="ai-btn" disabled>✨ Generate with AI</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-actions top-actions">
+                        <button type="submit" class="add-btn">
+                            {% if edit_experience %}Update Experience{% else %}+ Add Experience{% endif %}
+                        </button>
+
+                        {% if edit_experience %}
+                            <a href="/experience_detail" class="cancel-btn">Cancel</a>
+                        {% endif %}
+                    </div>
+                </form>
+
+                <!-- Added Experience -->
+                <div class="saved-section">
+                    <div class="saved-header">
+                        <h2>Added Experience</h2>
+                        <p>Your added experience records will appear here.</p>
+                    </div>
+
+                    <div id="experienceList" class="experience-list">
+                        {% if experience_list and experience_list|length > 0 %}
+                            {% for experience in experience_list %}
+                                <div class="experience-item">
+                                    <div class="experience-item-top">
+                                        <div>
+                                            <h3>
+                                                {% if experience.job_title_name %}
+                                                    {{ experience.job_title_name }}
+                                                {% elif experience.custom_job_title %}
+                                                    {{ experience.custom_job_title }}
+                                                {% else %}
+                                                    Job Title
+                                                {% endif %}
+                                            </h3>
+
+                                            {% if experience.company_name %}
+                                                <p><strong>Company:</strong> {{ experience.company_name }}</p>
+                                            {% endif %}
+
+                                            {% if experience.experience_type_name %}
+                                                <p><strong>Type:</strong> {{ experience.experience_type_name }}</p>
+                                            {% endif %}
+
+                                            {% if experience.location %}
+                                                <p><strong>Location:</strong> {{ experience.location }}</p>
+                                            {% endif %}
+
+                                            <p>
+                                                <strong>Duration:</strong>
+                                                {{ experience.start_month }}
+                                                {% if experience.currently_working %}
+                                                    to Present
+                                                {% elif experience.end_month %}
+                                                    to {{ experience.end_month }}
+                                                {% else %}
+                                                    to Present
+                                                {% endif %}
+                                            </p>
+
+                                            {% if experience.description %}
+                                                <p><strong>Description:</strong> {{ experience.description }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="experience-actions">
+                                        <a href="/experience_detail?edit_id={{ experience.id }}" class="edit-btn">Edit</a>
+                                        <a href="/experience/delete/{{ experience.id }}"
+                                           class="delete-btn"
+                                           onclick="return confirm('Are you sure you want to delete this experience record?')">
+                                            Delete
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state" id="emptyState">
+                                <div class="empty-icon">💼</div>
+                                <h3>No experience added yet</h3>
+                                <p>Add your work experience using the form above.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Bottom Navigation -->
+                <div class="bottom-nav">
+                    <a href="/education" class="back-btn">← Back</a>
+                    <a href="/certification" class="continue-btn">Continue →</a>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const jobTitleSelect = document.getElementById("job_title");
+        const customJobTitleGroup = document.getElementById("customJobTitleGroup");
+        const currentlyWorkingCheckbox = document.getElementById("currently_working");
+        const endMonthInput = document.getElementById("end_month");
+
+        function handleCustomJobTitle() {
+            if (jobTitleSelect.value === "other") {
+                customJobTitleGroup.style.display = "block";
+            } else {
+                customJobTitleGroup.style.display = "none";
+            }
+        }
+
+        function handleCurrentlyWorking() {
+            if (currentlyWorkingCheckbox.checked) {
+                endMonthInput.value = "";
+                endMonthInput.disabled = true;
+            } else {
+                endMonthInput.disabled = false;
+            }
+        }
+
+        if (jobTitleSelect) {
+            jobTitleSelect.addEventListener("change", handleCustomJobTitle);
+            handleCustomJobTitle();
+        }
+
+        if (currentlyWorkingCheckbox) {
+            currentlyWorkingCheckbox.addEventListener("change", handleCurrentlyWorking);
+            handleCurrentlyWorking();
+        }
+    </script>
+<script src="/static/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Degrees | CareerForge AI</title>
+  <link rel="stylesheet" href="/static/admin/admin_panel.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="admin-container">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+          <h2 class="brand-logo">
+              <span class="brand-blue">Career</span>Forge AI
+          </h2>
+          <p>Admin Panel</p>
+      </div>
+      <nav class="sidebar-menu">
+                <a href="/admin/dashboard" class="active">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
+                <a href="/admin/users">
+                    <i class="fa-solid fa-users"></i> Users
+                </a>
+                <a href="/admin/degrees">
+                    <i class="fa-solid fa-graduation-cap"></i> Degrees
+                </a>
+                <a href="/admin/courses">
+                    <i class="fa-solid fa-book"></i> Courses
+                </a>
+                <a href="/admin/institutes">
+                    <i class="fa-solid fa-building-columns"></i> Institutes
+                </a>
+                <a href="/admin/experience-types">
+                    <i class="fa-solid fa-user-clock"></i> Experience Types
+                </a>
+                <a href="/admin/job-titles">
+                    <i class="fa-solid fa-briefcase"></i> Job Titles
+                </a>
+                 <a href="/">
+                        <i class="fa-solid fa-house"></i> Go to Main Site
+                </a>
+                <a href="/admin/logout" class="logout-link">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Manage Degrees</h1>
+        <p>Add and manage degree master data</p>
+      </div>
+
+      <div class="panel-card form-card">
+        <h2>{% if edit_degree %}Edit Degree{% else %}Add Degree{% endif %}</h2>
+        <form action="/admin/degrees/add" method="post">
+          <input type="hidden" name="degree_id" value="{{ edit_degree[0] if edit_degree else '' }}">
+
+          <div class="form-group">
+            <label>Degree Name</label>
+            <input
+              type="text"
+              name="degree_name"
+              placeholder="Enter degree name"
+              value="{{ edit_degree[1] if edit_degree else '' }}"
+              required
+            >
+          </div>
+
+          <button type="submit" class="primary-btn">
+            {% if edit_degree %}Update Degree{% else %}Add Degree{% endif %}
+          </button>
+
+          {% if edit_degree %}
+            <a href="/admin/degrees" class="action-link">Cancel</a>
+          {% endif %}
+        </form>
+      </div>
+
+      <div class="panel-card">
+        <h2>All Degrees</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Degree Name</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if degrees %}
+              {% for degree in degrees %}
+              <tr>
+                <td>{{ degree[0] }}</td>
+                <td>{{ degree[1] }}</td>
+                <td>
+                  <a href="/admin/degrees?edit_id={{ degree[0] }}" class="action-link">Edit</a>
+                  <a href="/admin/degrees/delete/{{ degree[0] }}"
+                     class="action-link danger-link"
+                     onclick="return confirm('Are you sure you want to delete this degree?')">
+                    Delete
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="3">No degrees found</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

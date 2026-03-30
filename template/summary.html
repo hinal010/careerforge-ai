@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Professional Summary | CareerForge AI</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/summary.css">
+</head>
+<body>
+
+<div class="page-wrapper">
+
+    <header class="topbar">
+        <div class="logo"><span>Career</span>Forge AI</div>
+        <div class="topbar-actions">
+            <a href="/skills" class="back-link">← Back to Skills</a>
+        </div>
+    </header>
+   <section class="progress-section">
+    <div class="progress-wrap">
+
+        <div class="progress-step {% if step|default(0) > 1 %}completed{% elif step|default(0) == 1 %}active{% endif %}">
+            <span class="step-label">Profile</span>
+            <span class="step-dot"></span>
+        </div>
+
+        <div class="progress-step {% if step|default(0) > 2 %}completed{% elif step|default(0) == 2 %}active{% endif %}">
+            <span class="step-label">Education</span>
+            <span class="step-dot"></span>
+        </div>
+
+        <div class="progress-step {% if step|default(0) > 3 %}completed{% elif step|default(0) == 3 %}active{% endif %}">
+            <span class="step-label">Experience</span>
+            <span class="step-dot"></span>
+        </div>
+
+        <div class="progress-step {% if step|default(0) > 4 %}completed{% elif step|default(0) == 4 %}active{% endif %}">
+            <span class="step-label">Certification</span>
+            <span class="step-dot"></span>
+        </div>
+
+        <div class="progress-step {% if step|default(0) > 5 %}completed{% elif step|default(0) == 5 %}active{% endif %}">
+            <span class="step-label">Project</span>
+            <span class="step-dot"></span>
+        </div>
+
+        <div class="progress-step {% if step|default(0) > 6 %}completed{% elif step|default(0) == 6 %}active{% endif %}">
+            <span class="step-label">Skills</span>
+            <span class="step-dot"></span>
+        </div>
+
+        <div class="progress-step {% if step|default(0) > 7 %}completed{% elif step|default(0) == 7 %}active{% endif %}">
+            <span class="step-label">Summary</span>
+            <span class="step-dot"></span>
+        </div>
+
+    </div>
+</section>
+
+    <section class="summary-header">
+        <p class="summary-badge">Professional Summary</p>
+        <h1>Create Your Resume Summary</h1>
+        <p class="summary-subtext">
+            Write or generate a strong professional summary based on your resume details.
+        </p>
+    </section>
+
+    <main class="summary-main">
+        <div class="summary-shell">
+            <div class="summary-card">
+
+                {% if request.query_params.get("msg") == "summary_saved" %}
+                    <p class="success-msg">Summary saved successfully!</p>
+                {% endif %}
+
+                <form action="/save_summary" method="post" class="summary-form">
+
+                    <div class="form-group">
+                        <label for="professional_summary">Summary Description</label>
+
+                        <textarea
+                            id="professional_summary"
+                            name="professional_summary"
+                            placeholder="Example: Detail-oriented software engineering student with hands-on experience in Python, FastAPI, HTML, CSS, and JavaScript. Passionate about building user-friendly web applications and solving real-world problems through clean and efficient code."
+                        >{{ saved_summary if saved_summary else "" }}</textarea>
+
+                        <div class="ai-action">
+                            <button type="button" class="ai-btn">
+                                ✨ Generate with AI
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="summary-actions">
+                        <button type="submit" class="primary-btn">
+                            Save & Continue
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </main>
+
+</div>
+
+</body>
+</html>

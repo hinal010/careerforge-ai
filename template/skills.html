@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills | CareerForge AI</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/skills.css">
+</head>
+<body>
+
+<div class="page-wrapper">
+
+    <header class="topbar">
+        <div class="logo"><span>Career</span>Forge AI</div>
+    </header>
+
+    <section class="progress-section">
+        <div class="progress-wrap">
+
+            <div class="progress-step {% if step|default(0) > 1 %}completed{% elif step|default(0) == 1 %}active{% endif %}">
+                <span class="step-label">Profile</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 2 %}completed{% elif step|default(0) == 2 %}active{% endif %}">
+                <span class="step-label">Education</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 3 %}completed{% elif step|default(0) == 3 %}active{% endif %}">
+                <span class="step-label">Experience</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 4 %}completed{% elif step|default(0) == 4 %}active{% endif %}">
+                <span class="step-label">Certification</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 5 %}completed{% elif step|default(0) == 5 %}active{% endif %}">
+                <span class="step-label">Project</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 6 %}completed{% elif step|default(0) == 6 %}active{% endif %}">
+                <span class="step-label">Skills</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 7 %}completed{% elif step|default(0) == 7 %}active{% endif %}">
+                <span class="step-label">Summary</span>
+                <span class="step-dot"></span>
+            </div>
+
+        </div>
+    </section>
+
+    <main class="main-section">
+        <div class="skills-card">
+
+            <div class="card-header">
+                <h1>Skills Details</h1>
+                <p>Add your skills and job role.</p>
+            </div>
+
+            <form method="post" action="/skills_detail" class="skills-form">
+
+                <div class="section-block">
+                    <h2 class="section-title">Target Job Role</h2>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="job_role">Job Role</label>
+                            <select id="job_role" name="job_role" required>
+                                <option value="">Select Job Role</option>
+
+                                {% for role in job_role_list %}
+                                    <option value="{{ role.id }}"
+                                        {% if skills_data and skills_data.job_role_id == role.id %}selected{% endif %}>
+                                        {{ role.job_title }}
+                                    </option>
+                                {% endfor %}
+
+                                <option value="other"
+                                    {% if skills_data and skills_data.custom_job_role %}selected{% endif %}>
+                                    Other
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group {% if not (skills_data and skills_data.custom_job_role) %}hidden-field{% endif %}" id="customJobRoleGroup">
+                            <label for="custom_job_role">Custom Job Role</label>
+                            <input
+                                type="text"
+                                id="custom_job_role"
+                                name="custom_job_role"
+                                value="{{ skills_data.custom_job_role if skills_data else '' }}"
+                                placeholder="Enter your job role"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-block">
+                    <h2 class="section-title">Technical Skills</h2>
+
+                    <div class="form-grid">
+
+                        <div class="form-group full-width">
+                            <label for="languages">Languages</label>
+                            <input type="text" id="languages" name="languages"
+                                   value="{{ skills_data.languages if skills_data else '' }}"
+                                   placeholder="Python, Java, C++">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="frameworks">Frameworks</label>
+                            <input type="text" id="frameworks" name="frameworks"
+                                   value="{{ skills_data.frameworks if skills_data else '' }}"
+                                   placeholder="React, Django">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="tools">Tools</label>
+                            <input type="text" id="tools" name="tools"
+                                   value="{{ skills_data.tools if skills_data else '' }}"
+                                   placeholder="Git, Docker">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cloud_platforms">Cloud</label>
+                            <input type="text" id="cloud_platforms" name="cloud_platforms"
+                                   value="{{ skills_data.cloud_platforms if skills_data else '' }}"
+                                   placeholder="AWS, Azure, GCP">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="databases">Databases</label>
+                            <input type="text" id="databases" name="databases"
+                                   value="{{ skills_data.databases if skills_data else '' }}"
+                                   placeholder="MySQL, PostgreSQL, MongoDB">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="methodologies">Methodologies</label>
+                            <input type="text" id="methodologies" name="methodologies"
+                                   value="{{ skills_data.methodologies if skills_data else '' }}"
+                                   placeholder="Agile, Scrum, OOP, SDLC">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="section-block">
+                    <h2 class="section-title">Soft Skills</h2>
+
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="soft_skills">Soft Skills</label>
+                            <textarea
+                                id="soft_skills"
+                                name="soft_skills"
+                                rows="6"
+                                placeholder="Example: Communication, Teamwork, Problem Solving, Leadership, Time Management"
+                            >{{ skills_data.soft_skills if skills_data and skills_data.soft_skills else '' }}</textarea>
+
+                            <small class="helper-text">Use comma separated soft skills.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-block">
+                    <h2 class="section-title">AI Missing Skills</h2>
+
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="missing_skills_suggestions">Missing Skills Suggestions</label>
+                            <textarea
+                                id="missing_skills_suggestions"
+                                name="missing_skills_suggestions"
+                                rows="6"
+                                placeholder="Example: Add skills like REST API, SQL, Problem Solving, Team Collaboration, Docker"
+                            >{{ skills_data.missing_skills_suggestions if skills_data and skills_data.missing_skills_suggestions else '' }}</textarea>
+
+                            <div class="ai-action">
+                                <button type="button" class="ai-btn" onclick="generateMissingSkillsAI()">✨ Generate with AI</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="add-btn">Save Skills</button>
+                </div>
+
+            </form>
+
+            <div class="saved-section">
+                <div class="saved-header">
+                    <h2>Saved Skills</h2>
+                    <p>Your saved skills details will appear here.</p>
+                </div>
+
+                {% if skills_data %}
+                    <div class="skills-item">
+                        <p><strong>Role:</strong>
+                            {{ skills_data.job_role_name if skills_data.job_role_name else skills_data.custom_job_role }}
+                        </p>
+                        <p><strong>Languages:</strong> {{ skills_data.languages }}</p>
+                        <p><strong>Frameworks:</strong> {{ skills_data.frameworks }}</p>
+                        <p><strong>Tools:</strong> {{ skills_data.tools }}</p>
+                        <p><strong>Cloud:</strong> {{ skills_data.cloud_platforms }}</p>
+                        <p><strong>Databases:</strong> {{ skills_data.databases }}</p>
+                        <p><strong>Methodologies:</strong> {{ skills_data.methodologies }}</p>
+                        <p><strong>Soft Skills:</strong> {{ skills_data.soft_skills }}</p>
+                        <p><strong>AI Missing Skills:</strong> {{ skills_data.missing_skills_suggestions }}</p>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">🛠️</div>
+                        <h3>No skills added yet</h3>
+                        <p>Add your skills details using the form above.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="bottom-nav">
+                <a href="/project" class="back-btn">← Back</a>
+                <a href="/summary" class="continue-btn">Continue →</a>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+const jobRole = document.getElementById("job_role");
+const customGroup = document.getElementById("customJobRoleGroup");
+
+function toggleCustom() {
+    if (jobRole.value === "other") {
+        customGroup.style.display = "flex";
+    } else {
+        customGroup.style.display = "none";
+    }
+}
+
+function generateMissingSkillsAI() {
+    const roleSelect = document.getElementById("job_role");
+    const customRole = document.getElementById("custom_job_role");
+    const languages = document.getElementById("languages");
+    const frameworks = document.getElementById("frameworks");
+    const tools = document.getElementById("tools");
+    const cloud = document.getElementById("cloud_platforms");
+    const databases = document.getElementById("databases");
+    const methodologies = document.getElementById("methodologies");
+    const output = document.getElementById("missing_skills_suggestions");
+
+    let roleText = "";
+    if (roleSelect.value === "other") {
+        roleText = customRole.value.trim().toLowerCase();
+    } else {
+        roleText = roleSelect.options[roleSelect.selectedIndex]?.text.toLowerCase() || "";
+    }
+
+    const currentSkills = [
+        languages.value,
+        frameworks.value,
+        tools.value,
+        cloud.value,
+        databases.value,
+        methodologies.value
+    ].join(", ").toLowerCase();
+
+    let suggestions = [];
+
+    if (roleText.includes("frontend")) {
+        suggestions = ["JavaScript", "React", "Responsive Design", "Git", "REST API", "TypeScript"];
+    } else if (roleText.includes("backend")) {
+        suggestions = ["Python", "FastAPI", "REST API", "SQL", "Authentication", "Docker"];
+    } else if (roleText.includes("full stack")) {
+        suggestions = ["React", "Node.js", "REST API", "SQL", "Git", "Deployment"];
+    } else if (roleText.includes("data")) {
+        suggestions = ["Python", "Pandas", "SQL", "Machine Learning", "Data Visualization"];
+    } else {
+        suggestions = ["Communication", "Problem Solving", "Team Collaboration", "Git", "SQL"];
+    }
+
+    const filtered = suggestions.filter(skill => !currentSkills.includes(skill.toLowerCase()));
+    output.value = filtered.join(", ");
+}
+
+jobRole.addEventListener("change", toggleCustom);
+toggleCustom();
+</script>
+
+<script src="/static/common.js"></script>
+</body>
+</html>
