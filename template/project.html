@@ -18,46 +18,46 @@
         </header>
 
         <!-- Progress Bar -->
-<section class="progress-section">
-    <div class="progress-wrap">
+        <section class="progress-section">
+            <div class="progress-wrap">
 
-        <div class="progress-step {% if step|default(0) > 1 %}completed{% elif step|default(0) == 1 %}active{% endif %}">
-            <span class="step-label">Profile</span>
-            <span class="step-dot"></span>
-        </div>
+                <div class="progress-step {% if step|default(0) > 1 %}completed{% elif step|default(0) == 1 %}active{% endif %}">
+                    <span class="step-label">Profile</span>
+                    <span class="step-dot"></span>
+                </div>
 
-        <div class="progress-step {% if step|default(0) > 2 %}completed{% elif step|default(0) == 2 %}active{% endif %}">
-            <span class="step-label">Education</span>
-            <span class="step-dot"></span>
-        </div>
+                <div class="progress-step {% if step|default(0) > 2 %}completed{% elif step|default(0) == 2 %}active{% endif %}">
+                    <span class="step-label">Education</span>
+                    <span class="step-dot"></span>
+                </div>
 
-        <div class="progress-step {% if step|default(0) > 3 %}completed{% elif step|default(0) == 3 %}active{% endif %}">
-            <span class="step-label">Experience</span>
-            <span class="step-dot"></span>
-        </div>
+                <div class="progress-step {% if step|default(0) > 3 %}completed{% elif step|default(0) == 3 %}active{% endif %}">
+                    <span class="step-label">Experience</span>
+                    <span class="step-dot"></span>
+                </div>
 
-        <div class="progress-step {% if step|default(0) > 4 %}completed{% elif step|default(0) == 4 %}active{% endif %}">
-            <span class="step-label">Certification</span>
-            <span class="step-dot"></span>
-        </div>
+                <div class="progress-step {% if step|default(0) > 4 %}completed{% elif step|default(0) == 4 %}active{% endif %}">
+                    <span class="step-label">Certification</span>
+                    <span class="step-dot"></span>
+                </div>
 
-        <div class="progress-step {% if step|default(0) > 5 %}completed{% elif step|default(0) == 5 %}active{% endif %}">
-            <span class="step-label">Project</span>
-            <span class="step-dot"></span>
-        </div>
+                <div class="progress-step {% if step|default(0) > 5 %}completed{% elif step|default(0) == 5 %}active{% endif %}">
+                    <span class="step-label">Project</span>
+                    <span class="step-dot"></span>
+                </div>
 
-        <div class="progress-step {% if step|default(0) > 6 %}completed{% elif step|default(0) == 6 %}active{% endif %}">
-            <span class="step-label">Skills</span>
-            <span class="step-dot"></span>
-        </div>
+                <div class="progress-step {% if step|default(0) > 6 %}completed{% elif step|default(0) == 6 %}active{% endif %}">
+                    <span class="step-label">Skills</span>
+                    <span class="step-dot"></span>
+                </div>
 
-        <div class="progress-step {% if step|default(0) > 7 %}completed{% elif step|default(0) == 7 %}active{% endif %}">
-            <span class="step-label">Summary</span>
-            <span class="step-dot"></span>
-        </div>
+                <div class="progress-step {% if step|default(0) > 7 %}completed{% elif step|default(0) == 7 %}active{% endif %}">
+                    <span class="step-label">Summary</span>
+                    <span class="step-dot"></span>
+                </div>
 
-    </div>
-</section>
+            </div>
+        </section>
 
         <!-- Main -->
         <main class="main-section">
@@ -75,12 +75,26 @@
 
                         <div class="form-group full-width">
                             <label for="project_title">Project Title</label>
-                            <input type="text" id="project_title" name="project_title" placeholder="Enter project title" required>
+                            <input
+                                type="text"
+                                id="project_title"
+                                name="project_title"
+                                placeholder="Enter project title"
+                                value="{{ edit_project.project_title if edit_project else '' }}"
+                                required
+                            >
                         </div>
 
                         <div class="form-group full-width">
                             <label for="technologies">Technologies Used</label>
-                            <input type="text" id="technologies" name="technologies" placeholder="Example: Python, FastAPI, HTML, CSS, JavaScript" required>
+                            <input
+                                type="text"
+                                id="technologies"
+                                name="technologies"
+                                placeholder="Example: Python, FastAPI, HTML, CSS, JavaScript"
+                                value="{{ edit_project.technologies if edit_project else '' }}"
+                                required
+                            >
                             <small class="helper-text">Use comma separated technologies.</small>
                         </div>
 
@@ -92,15 +106,17 @@
                                 rows="6"
                                 placeholder="Example: Built an AI-powered resume builder that helps users create professional resumes with guided sections and smart content generation."
                                 required
-                            ></textarea>
+                            >{{ edit_project.description if edit_project else '' }}</textarea>
 
                             <div class="ai-action">
-                                <button type="button" class="ai-btn" onclick="generateProjectAI()">✨ Generate with AI</button>
+                                <button type="button" class="ai-btn" id="generateAiProjectBtn">✨ Generate with AI</button>
                             </div>
                         </div>
 
                     </div>
-                <input type="hidden" name="project_id" value="{{ edit_project.id if edit_project else '' }}">
+
+                    <input type="hidden" name="project_id" value="{{ edit_project.id if edit_project else '' }}">
+
                     <button type="submit" class="add-btn">
                         {% if edit_project %}Update Project{% else %}+ Add Project{% endif %}
                     </button>
@@ -119,16 +135,14 @@
                                 <div class="project-item">
                                     <div>
                                         <h3>{{ project.project_title }}</h3>
-
                                         <p><strong>Technologies:</strong> {{ project.technologies }}</p>
-
                                         <p><strong>Description:</strong> {{ project.description }}</p>
                                     </div>
 
                                     <div class="project-actions">
                                         <a href="/project_detail?edit_id={{ project.id }}" class="edit-btn">Edit</a>
                                         <a href="/project/delete/{{ project.id }}" class="delete-btn"
-                                        onclick="return confirm('Are you sure you want to delete this project?')">
+                                           onclick="return confirm('Are you sure you want to delete this project?')">
                                             Delete
                                         </a>
                                     </div>
@@ -154,6 +168,74 @@
         </main>
 
     </div>
+
+    <script>
+        const projectTitleInput = document.getElementById("project_title");
+        const technologiesInput = document.getElementById("technologies");
+        const projectDescriptionField = document.getElementById("description");
+        const generateAiProjectBtn = document.getElementById("generateAiProjectBtn");
+
+        function updateProjectAiButtonText() {
+            if (!generateAiProjectBtn || !projectDescriptionField) return;
+
+            if (projectDescriptionField.value.trim()) {
+                generateAiProjectBtn.textContent = "✨ Improve with AI";
+            } else {
+                generateAiProjectBtn.textContent = "✨ Generate with AI";
+            }
+        }
+
+        async function generateProjectAI() {
+            const projectTitle = projectTitleInput ? projectTitleInput.value.trim() : "";
+            const technologies = technologiesInput ? technologiesInput.value.trim() : "";
+            const userInput = projectDescriptionField ? projectDescriptionField.value.trim() : "";
+
+            if (!projectTitle && !technologies && !userInput) {
+                alert("Please enter project title, technologies, or some description notes first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("project_title", projectTitle);
+            formData.append("technologies", technologies);
+            formData.append("user_input", userInput);
+
+            const oldText = generateAiProjectBtn.textContent;
+            generateAiProjectBtn.disabled = true;
+            generateAiProjectBtn.textContent = "Generating...";
+
+            try {
+                const response = await fetch("/api/generate-project-description", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Failed to generate project description.");
+                }
+
+                projectDescriptionField.value = data.description || "";
+                updateProjectAiButtonText();
+            } catch (error) {
+                alert(error.message || "Something went wrong while generating project description.");
+            } finally {
+                generateAiProjectBtn.disabled = false;
+                generateAiProjectBtn.textContent = oldText;
+                updateProjectAiButtonText();
+            }
+        }
+
+        if (projectDescriptionField) {
+            projectDescriptionField.addEventListener("input", updateProjectAiButtonText);
+            updateProjectAiButtonText();
+        }
+
+        if (generateAiProjectBtn) {
+            generateAiProjectBtn.addEventListener("click", generateProjectAI);
+        }
+    </script>
 
     <script src="/static/common.js"></script>
 </body>

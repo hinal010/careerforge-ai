@@ -151,13 +151,11 @@ CREATE TABLE IF NOT EXISTS user_skills (
     user_id INTEGER UNIQUE,
     job_role_id INTEGER,
     custom_job_role TEXT,
-    languages TEXT,
-    frameworks TEXT,
-    tools TEXT,
-    cloud_platforms TEXT,
-    databases TEXT,
-    methodologies TEXT,
+    core_skills TEXT,
     soft_skills TEXT,
+    tools_technologies TEXT,
+    languages TEXT,
+    missing_skills_suggestions TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (job_role_id) REFERENCES job_title_master(id)
 )

@@ -62,13 +62,12 @@
 
             <div class="card-header">
                 <h1>Skills Details</h1>
-                <p>Add your skills and job role.</p>
+                <p>Add your skills based on your target job role.</p>
             </div>
 
             <form method="post" action="/skills_detail" class="skills-form">
 
                 <div class="section-block">
-                    <h2 class="section-title">Target Job Role</h2>
 
                     <div class="form-grid">
                         <div class="form-group">
@@ -104,88 +103,78 @@
                 </div>
 
                 <div class="section-block">
-                    <h2 class="section-title">Technical Skills</h2>
-
+                    <h2 class="section-title">Core Skills</h2>
                     <div class="form-grid">
-
                         <div class="form-group full-width">
-                            <label for="languages">Languages</label>
-                            <input type="text" id="languages" name="languages"
-                                   value="{{ skills_data.languages if skills_data else '' }}"
-                                   placeholder="Python, Java, C++">
+                            <textarea
+                                id="core_skills"
+                                name="core_skills"
+                                rows="1"
+                                placeholder="Example: HTML, CSS, JavaScript, Python, Accounting, Recruitment, Teaching"
+                            >{{ skills_data.core_skills if skills_data and skills_data.core_skills else '' }}</textarea>
+                            <small class="helper-text">Enter the main skills for your selected job role.</small>
                         </div>
-
-                        <div class="form-group full-width">
-                            <label for="frameworks">Frameworks</label>
-                            <input type="text" id="frameworks" name="frameworks"
-                                   value="{{ skills_data.frameworks if skills_data else '' }}"
-                                   placeholder="React, Django">
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label for="tools">Tools</label>
-                            <input type="text" id="tools" name="tools"
-                                   value="{{ skills_data.tools if skills_data else '' }}"
-                                   placeholder="Git, Docker">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="cloud_platforms">Cloud</label>
-                            <input type="text" id="cloud_platforms" name="cloud_platforms"
-                                   value="{{ skills_data.cloud_platforms if skills_data else '' }}"
-                                   placeholder="AWS, Azure, GCP">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="databases">Databases</label>
-                            <input type="text" id="databases" name="databases"
-                                   value="{{ skills_data.databases if skills_data else '' }}"
-                                   placeholder="MySQL, PostgreSQL, MongoDB">
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label for="methodologies">Methodologies</label>
-                            <input type="text" id="methodologies" name="methodologies"
-                                   value="{{ skills_data.methodologies if skills_data else '' }}"
-                                   placeholder="Agile, Scrum, OOP, SDLC">
-                        </div>
-
                     </div>
                 </div>
 
                 <div class="section-block">
                     <h2 class="section-title">Soft Skills</h2>
-
                     <div class="form-grid">
                         <div class="form-group full-width">
-                            <label for="soft_skills">Soft Skills</label>
                             <textarea
                                 id="soft_skills"
                                 name="soft_skills"
-                                rows="6"
-                                placeholder="Example: Communication, Teamwork, Problem Solving, Leadership, Time Management"
+                                rows="1"
+                                placeholder="Example: Communication, Teamwork, Leadership, Problem Solving"
                             >{{ skills_data.soft_skills if skills_data and skills_data.soft_skills else '' }}</textarea>
-
                             <small class="helper-text">Use comma separated soft skills.</small>
                         </div>
                     </div>
                 </div>
 
                 <div class="section-block">
-                    <h2 class="section-title">AI Missing Skills</h2>
-
+                    <h2 class="section-title">Tools / Technologies</h2>
                     <div class="form-grid">
                         <div class="form-group full-width">
-                            <label for="missing_skills_suggestions">Missing Skills Suggestions</label>
+                            <textarea
+                                id="tools_technologies"
+                                name="tools_technologies"
+                                rows="1"
+                                placeholder="Example: Git, Docker, Excel, Power BI, Figma, Tally"
+                            >{{ skills_data.tools_technologies if skills_data and skills_data.tools_technologies else '' }}</textarea>
+                            <small class="helper-text">Add tools, software, platforms, or technologies you know.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-block">
+                    <h2 class="section-title">Languages</h2>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <textarea
+                                id="languages"
+                                name="languages"
+                                rows="1"
+                                placeholder="Example:English, Hindi,Gujrati,Spanish"
+                            >{{ skills_data.languages if skills_data and skills_data.languages else '' }}</textarea>
+                            <small class="helper-text">You can add spoken languages.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-block">
+                    <h2 class="section-title">Missing Skills from AI</h2>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
                             <textarea
                                 id="missing_skills_suggestions"
                                 name="missing_skills_suggestions"
                                 rows="6"
-                                placeholder="Example: Add skills like REST API, SQL, Problem Solving, Team Collaboration, Docker"
+                                placeholder="AI suggestions will appear here based on selected job role and entered skills"
                             >{{ skills_data.missing_skills_suggestions if skills_data and skills_data.missing_skills_suggestions else '' }}</textarea>
 
                             <div class="ai-action">
-                                <button type="button" class="ai-btn" onclick="generateMissingSkillsAI()">✨ Generate with AI</button>
+                                <button type="button" class="ai-btn" id="generateMissingSkillsBtn">✨ Generate with AI</button>
                             </div>
                         </div>
                     </div>
@@ -208,13 +197,10 @@
                         <p><strong>Role:</strong>
                             {{ skills_data.job_role_name if skills_data.job_role_name else skills_data.custom_job_role }}
                         </p>
-                        <p><strong>Languages:</strong> {{ skills_data.languages }}</p>
-                        <p><strong>Frameworks:</strong> {{ skills_data.frameworks }}</p>
-                        <p><strong>Tools:</strong> {{ skills_data.tools }}</p>
-                        <p><strong>Cloud:</strong> {{ skills_data.cloud_platforms }}</p>
-                        <p><strong>Databases:</strong> {{ skills_data.databases }}</p>
-                        <p><strong>Methodologies:</strong> {{ skills_data.methodologies }}</p>
+                        <p><strong>Core Skills:</strong> {{ skills_data.core_skills }}</p>
                         <p><strong>Soft Skills:</strong> {{ skills_data.soft_skills }}</p>
+                        <p><strong>Tools / Technologies:</strong> {{ skills_data.tools_technologies }}</p>
+                        <p><strong>Languages:</strong> {{ skills_data.languages }}</p>
                         <p><strong>AI Missing Skills:</strong> {{ skills_data.missing_skills_suggestions }}</p>
                     </div>
                 {% else %}
@@ -238,8 +224,17 @@
 <script>
 const jobRole = document.getElementById("job_role");
 const customGroup = document.getElementById("customJobRoleGroup");
+const customJobRoleInput = document.getElementById("custom_job_role");
+const coreSkillsInput = document.getElementById("core_skills");
+const softSkillsInput = document.getElementById("soft_skills");
+const toolsInput = document.getElementById("tools_technologies");
+const languagesInput = document.getElementById("languages");
+const missingSkillsField = document.getElementById("missing_skills_suggestions");
+const generateMissingSkillsBtn = document.getElementById("generateMissingSkillsBtn");
 
 function toggleCustom() {
+    if (!jobRole || !customGroup) return;
+
     if (jobRole.value === "other") {
         customGroup.style.display = "flex";
     } else {
@@ -247,53 +242,72 @@ function toggleCustom() {
     }
 }
 
-function generateMissingSkillsAI() {
-    const roleSelect = document.getElementById("job_role");
-    const customRole = document.getElementById("custom_job_role");
-    const languages = document.getElementById("languages");
-    const frameworks = document.getElementById("frameworks");
-    const tools = document.getElementById("tools");
-    const cloud = document.getElementById("cloud_platforms");
-    const databases = document.getElementById("databases");
-    const methodologies = document.getElementById("methodologies");
-    const output = document.getElementById("missing_skills_suggestions");
+function getSelectedJobRoleText() {
+    if (!jobRole || jobRole.selectedIndex < 0) return "";
 
-    let roleText = "";
-    if (roleSelect.value === "other") {
-        roleText = customRole.value.trim().toLowerCase();
-    } else {
-        roleText = roleSelect.options[roleSelect.selectedIndex]?.text.toLowerCase() || "";
+    if (jobRole.value === "other") {
+        return customJobRoleInput ? customJobRoleInput.value.trim() : "";
     }
 
-    const currentSkills = [
-        languages.value,
-        frameworks.value,
-        tools.value,
-        cloud.value,
-        databases.value,
-        methodologies.value
-    ].join(", ").toLowerCase();
-
-    let suggestions = [];
-
-    if (roleText.includes("frontend")) {
-        suggestions = ["JavaScript", "React", "Responsive Design", "Git", "REST API", "TypeScript"];
-    } else if (roleText.includes("backend")) {
-        suggestions = ["Python", "FastAPI", "REST API", "SQL", "Authentication", "Docker"];
-    } else if (roleText.includes("full stack")) {
-        suggestions = ["React", "Node.js", "REST API", "SQL", "Git", "Deployment"];
-    } else if (roleText.includes("data")) {
-        suggestions = ["Python", "Pandas", "SQL", "Machine Learning", "Data Visualization"];
-    } else {
-        suggestions = ["Communication", "Problem Solving", "Team Collaboration", "Git", "SQL"];
-    }
-
-    const filtered = suggestions.filter(skill => !currentSkills.includes(skill.toLowerCase()));
-    output.value = filtered.join(", ");
+    return jobRole.options[jobRole.selectedIndex].text || "";
 }
 
-jobRole.addEventListener("change", toggleCustom);
-toggleCustom();
+async function generateMissingSkillsAI() {
+    const selectedJobRoleText = getSelectedJobRoleText();
+    const customJobRole = customJobRoleInput ? customJobRoleInput.value.trim() : "";
+    const coreSkills = coreSkillsInput ? coreSkillsInput.value.trim() : "";
+    const softSkills = softSkillsInput ? softSkillsInput.value.trim() : "";
+    const tools = toolsInput ? toolsInput.value.trim() : "";
+    const languages = languagesInput ? languagesInput.value.trim() : "";
+
+    if (!selectedJobRoleText && !customJobRole) {
+        alert("Please select or enter a job role first.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("job_role", selectedJobRoleText);
+    formData.append("custom_job_role", customJobRole);
+    formData.append("core_skills", coreSkills);
+    formData.append("soft_skills", softSkills);
+    formData.append("tools_technologies", tools);
+    formData.append("languages", languages);
+
+    const oldText = generateMissingSkillsBtn.textContent;
+    generateMissingSkillsBtn.disabled = true;
+    generateMissingSkillsBtn.textContent = "Generating...";
+
+    try {
+        const response = await fetch("/api/generate-missing-skills", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to generate missing skills.");
+        }
+
+        if (missingSkillsField) {
+            missingSkillsField.value = data.missing_skills_suggestions || "";
+        }
+    } catch (error) {
+        alert(error.message || "Something went wrong while generating missing skills.");
+    } finally {
+        generateMissingSkillsBtn.disabled = false;
+        generateMissingSkillsBtn.textContent = oldText;
+    }
+}
+
+if (jobRole) {
+    jobRole.addEventListener("change", toggleCustom);
+    toggleCustom();
+}
+
+if (generateMissingSkillsBtn) {
+    generateMissingSkillsBtn.addEventListener("click", generateMissingSkillsAI);
+}
 </script>
 
 <script src="/static/common.js"></script>

@@ -2,11 +2,19 @@ import shutil
 from pathlib import Path
 
 from fastapi import FastAPI, Request, Form, File, UploadFile, Query
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
-
+from authlib.integrations.starlette_client import OAuth, OAuthError
+from auth_config import (
+    SESSION_SECRET_KEY,
+    ADMIN_EMAIL,
+    ADMIN_PASSWORD,
+    CLIENT_ID,
+    CLIENT_SECRET,
+    GOOGLE_REDIRECT_URI,
+)
 import models
 from auth import verify_password
 from auth_config import SESSION_SECRET_KEY, ADMIN_EMAIL, ADMIN_PASSWORD
@@ -75,13 +83,29 @@ from crud import (
     search_users,
     get_admin_user_detail,
 )
+from ai_service import (
+    generate_experience_description,
+    generate_project_description,
+    generate_missing_skills,
+    generate_professional_summary,
+)
 from database import conn
 
 app = FastAPI()
-
+oauth = OAuth()
+oauth.register(
+    name="google",
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET,
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={
+        "scope": "openid email profile"
+    }
+)
 app.add_middleware(
     SessionMiddleware,
-    secret_key=SESSION_SECRET_KEY or "careerforge_session_secret"
+    secret_key=SESSION_SECRET_KEY or "careerforge_session_secret",
+    max_age=60 * 60 * 24 * 7   # 7 days
 )
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -291,9 +315,6 @@ def index(request: Request):
 # =========================================================
 @app.get("/register", response_class=HTMLResponse)
 def register_page(request: Request):
-    if request.session.get("user_id"):
-        return RedirectResponse(url="/profile", status_code=303)
-
     return templates.TemplateResponse(
         request,
         "register.html",
@@ -302,8 +323,6 @@ def register_page(request: Request):
         }
     )
 
-
-@app.post("/register")
 @app.post("/register")
 def register_user(
     request: Request,
@@ -330,14 +349,13 @@ def register_user(
 
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
-    if request.session.get("user_id"):
-        return RedirectResponse(url="/profile", status_code=303)
-
     return templates.TemplateResponse(
         request,
         "login.html",
         {
-            "request": request
+            "request": request,
+            "msg": request.query_params.get("msg"),
+            "error": request.query_params.get("error")
         }
     )
 
@@ -374,10 +392,45 @@ def logout(request: Request):
 
 
 @app.get("/auth/google")
-def auth_google():
-    return RedirectResponse(url="/login", status_code=303)
+async def auth_google(request: Request):
+    redirect_uri = GOOGLE_REDIRECT_URI
+    return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
+@app.get("/auth")
+async def auth_google_callback(request: Request):
+    try:
+        token = await oauth.google.authorize_access_token(request)
+    except OAuthError:
+        return RedirectResponse(url="/login?error=google_auth_failed", status_code=303)
+
+    user_info = token.get("userinfo")
+    if not user_info:
+        return RedirectResponse(url="/login?error=google_userinfo_failed", status_code=303)
+
+    email = user_info.get("email")
+    full_name = user_info.get("name") or (email.split("@")[0] if email else "Google User")
+    username = email.split("@")[0] if email else "google_user"
+
+    if not email:
+        return RedirectResponse(url="/login?error=no_email_found", status_code=303)
+
+    user = get_user_by_email(email)
+
+    if not user:
+        create_user(
+            username=username,
+            full_name=full_name,
+            email=email,
+            password="google_auth_user"
+        )
+        user = get_user_by_email(email)
+
+    request.session["user_id"] = user["id"]
+    request.session["user_email"] = user["email"]
+    request.session["user_name"] = user["full_name"]
+
+    return RedirectResponse(url="/profile", status_code=303)
 # =========================================================
 # PROFILE
 # =========================================================
@@ -438,7 +491,22 @@ def save_profile(
     )
 
     return RedirectResponse(url="/education_detail?msg=profile_saved", status_code=303)
+@app.get("/my-profile", response_class=HTMLResponse)
+def my_profile_page(request: Request):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return user
 
+    profile = get_user_profile(user["id"])
+
+    return templates.TemplateResponse(
+        "my_profile.html",
+        {
+            "request": request,
+            "user": user,
+            "profile": profile
+        }
+    )
 
 # =========================================================
 # EDUCATION
@@ -638,6 +706,47 @@ def remove_experience(request: Request, exp_id: int):
     delete_experience(exp_id, user["id"])
     return RedirectResponse(url="/experience_detail?msg=deleted", status_code=303)
 
+@app.post("/api/generate-experience-description")
+def api_generate_experience_description(
+    request: Request,
+    job_title: str = Form(""),
+    custom_job_title: str = Form(""),
+    experience_type: str = Form(""),
+    company_name: str = Form(""),
+    location: str = Form(""),
+    user_input: str = Form("")
+):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return JSONResponse(
+            status_code=401,
+            content={"error": "User not logged in"}
+        )
+
+    final_title = custom_job_title.strip() if custom_job_title.strip() else job_title.strip()
+
+    if not final_title and not company_name.strip() and not user_input.strip():
+        return JSONResponse(
+            status_code=400,
+            content={"error": "Please enter job title, company name, or some description notes first."}
+        )
+
+    try:
+        result = generate_experience_description(
+            job_title=job_title,
+            custom_job_title=custom_job_title,
+            experience_type=experience_type,
+            company_name=company_name,
+            location=location,
+            user_input=user_input
+        )
+        return {"description": result}
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"AI generation failed: {str(e)}"}
+        )
 
 # =========================================================
 # SKILLS
@@ -671,13 +780,11 @@ def save_skills_detail(
     request: Request,
     job_role: str = Form(...),
     custom_job_role: str = Form(""),
+    core_skills: str = Form(""),
+    soft_skills: str = Form(""),
+    tools_technologies: str = Form(""),
     languages: str = Form(""),
-    frameworks: str = Form(""),
-    tools: str = Form(""),
-    cloud_platforms: str = Form(""),
-    databases: str = Form(""),
-    methodologies: str = Form(""),
-    soft_skills: str = Form("")
+    missing_skills_suggestions: str = Form("")
 ):
     user = require_login(request)
     if isinstance(user, RedirectResponse):
@@ -687,7 +794,7 @@ def save_skills_detail(
     custom_role_value = ""
 
     if job_role == "other":
-        custom_role_value = custom_job_role
+        custom_role_value = custom_job_role.strip()
     else:
         job_role_id = int(job_role)
 
@@ -695,18 +802,55 @@ def save_skills_detail(
         user_id=user["id"],
         job_role_id=job_role_id,
         custom_job_role=custom_role_value,
+        core_skills=core_skills,
+        soft_skills=soft_skills,
+        tools_technologies=tools_technologies,
         languages=languages,
-        frameworks=frameworks,
-        tools=tools,
-        cloud_platforms=cloud_platforms,
-        databases=databases,
-        methodologies=methodologies,
-        soft_skills=soft_skills
+        missing_skills_suggestions=missing_skills_suggestions
     )
 
-    return RedirectResponse(url="/project?msg=skills_saved", status_code=303)
+    return RedirectResponse(url="/skills?msg=skills_saved", status_code=303)
 
+@app.post("/api/generate-missing-skills")
+def api_generate_missing_skills(
+    request: Request,
+    job_role: str = Form(""),
+    custom_job_role: str = Form(""),
+    core_skills: str = Form(""),
+    soft_skills: str = Form(""),
+    tools_technologies: str = Form(""),
+    languages: str = Form("")
+):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return JSONResponse(
+            status_code=401,
+            content={"error": "User not logged in"}
+        )
 
+    final_job_role = custom_job_role.strip() if custom_job_role.strip() else job_role.strip()
+
+    if not final_job_role:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "Please select or enter a job role first."}
+        )
+
+    try:
+        result = generate_missing_skills(
+            job_role=final_job_role,
+            current_core_skills=core_skills,
+            current_soft_skills=soft_skills,
+            current_tools=tools_technologies,
+            current_languages=languages
+        )
+        return {"missing_skills_suggestions": result}
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"AI generation failed: {str(e)}"}
+        )
 # =========================================================
 # PROJECT
 # =========================================================
@@ -768,6 +912,40 @@ def remove_project(request: Request, project_id: int):
     delete_project(project_id, user["id"])
     return RedirectResponse(url="/project?msg=deleted", status_code=303)
 
+@app.post("/api/generate-project-description")
+def api_generate_project_description(
+    request: Request,
+    project_title: str = Form(""),
+    technologies: str = Form(""),
+    user_input: str = Form("")
+):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return JSONResponse(
+            status_code=401,
+            content={"error": "User not logged in"}
+        )
+
+    if not project_title.strip() and not technologies.strip() and not user_input.strip():
+        return JSONResponse(
+            status_code=400,
+            content={"error": "Please enter project title, technologies, or some description notes first."}
+        )
+
+    try:
+        result = generate_project_description(
+            project_title=project_title,
+            technologies=technologies,
+            user_input=user_input
+        )
+        return {"description": result}
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"AI generation failed: {str(e)}"}
+        )
+
 
 # =========================================================
 # SUMMARY
@@ -793,7 +971,43 @@ def summary_page(request: Request):
         }
     )
 
+@app.post("/api/generate-summary")
+def api_generate_summary(
+    request: Request,
+    existing_summary: str = Form("")
+):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return JSONResponse(
+            status_code=401,
+            content={"error": "User not logged in"}
+        )
 
+    try:
+        profile = get_user_profile(user["id"])
+        educations = get_education(user["id"])
+        experiences = get_experience(user["id"])
+        skills = get_skills(user["id"])
+        projects = get_projects(user["id"])
+        certifications = get_certifications(user["id"])
+
+        result = generate_professional_summary(
+            profile=profile,
+            educations=educations,
+            experiences=experiences,
+            skills=skills,
+            projects=projects,
+            certifications=certifications,
+            existing_summary=existing_summary
+        )
+
+        return {"professional_summary": result}
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"AI generation failed: {str(e)}"}
+        )
 @app.post("/save_summary")
 def save_summary(request: Request, professional_summary: str = Form(...)):
     user = require_login(request)
@@ -801,7 +1015,7 @@ def save_summary(request: Request, professional_summary: str = Form(...)):
         return user
 
     save_professional_summary(user["id"], professional_summary)
-    return RedirectResponse(url="/certification?msg=summary_saved", status_code=303)
+    return RedirectResponse(url="/choose_template?msg=summary_saved", status_code=303)
 
 
 # =========================================================

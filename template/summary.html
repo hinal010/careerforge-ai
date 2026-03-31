@@ -18,46 +18,47 @@
             <a href="/skills" class="back-link">← Back to Skills</a>
         </div>
     </header>
-   <section class="progress-section">
-    <div class="progress-wrap">
 
-        <div class="progress-step {% if step|default(0) > 1 %}completed{% elif step|default(0) == 1 %}active{% endif %}">
-            <span class="step-label">Profile</span>
-            <span class="step-dot"></span>
+    <section class="progress-section">
+        <div class="progress-wrap">
+
+            <div class="progress-step {% if step|default(0) > 1 %}completed{% elif step|default(0) == 1 %}active{% endif %}">
+                <span class="step-label">Profile</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 2 %}completed{% elif step|default(0) == 2 %}active{% endif %}">
+                <span class="step-label">Education</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 3 %}completed{% elif step|default(0) == 3 %}active{% endif %}">
+                <span class="step-label">Experience</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 4 %}completed{% elif step|default(0) == 4 %}active{% endif %}">
+                <span class="step-label">Certification</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 5 %}completed{% elif step|default(0) == 5 %}active{% endif %}">
+                <span class="step-label">Project</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 6 %}completed{% elif step|default(0) == 6 %}active{% endif %}">
+                <span class="step-label">Skills</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 7 %}completed{% elif step|default(0) == 7 %}active{% endif %}">
+                <span class="step-label">Summary</span>
+                <span class="step-dot"></span>
+            </div>
+
         </div>
-
-        <div class="progress-step {% if step|default(0) > 2 %}completed{% elif step|default(0) == 2 %}active{% endif %}">
-            <span class="step-label">Education</span>
-            <span class="step-dot"></span>
-        </div>
-
-        <div class="progress-step {% if step|default(0) > 3 %}completed{% elif step|default(0) == 3 %}active{% endif %}">
-            <span class="step-label">Experience</span>
-            <span class="step-dot"></span>
-        </div>
-
-        <div class="progress-step {% if step|default(0) > 4 %}completed{% elif step|default(0) == 4 %}active{% endif %}">
-            <span class="step-label">Certification</span>
-            <span class="step-dot"></span>
-        </div>
-
-        <div class="progress-step {% if step|default(0) > 5 %}completed{% elif step|default(0) == 5 %}active{% endif %}">
-            <span class="step-label">Project</span>
-            <span class="step-dot"></span>
-        </div>
-
-        <div class="progress-step {% if step|default(0) > 6 %}completed{% elif step|default(0) == 6 %}active{% endif %}">
-            <span class="step-label">Skills</span>
-            <span class="step-dot"></span>
-        </div>
-
-        <div class="progress-step {% if step|default(0) > 7 %}completed{% elif step|default(0) == 7 %}active{% endif %}">
-            <span class="step-label">Summary</span>
-            <span class="step-dot"></span>
-        </div>
-
-    </div>
-</section>
+    </section>
 
     <section class="summary-header">
         <p class="summary-badge">Professional Summary</p>
@@ -87,7 +88,7 @@
                         >{{ saved_summary if saved_summary else "" }}</textarea>
 
                         <div class="ai-action">
-                            <button type="button" class="ai-btn">
+                            <button type="button" class="ai-btn" id="generateSummaryBtn">
                                 ✨ Generate with AI
                             </button>
                         </div>
@@ -107,5 +108,66 @@
 
 </div>
 
+<script>
+    const summaryField = document.getElementById("professional_summary");
+    const generateSummaryBtn = document.getElementById("generateSummaryBtn");
+
+    function updateSummaryButtonText() {
+        if (!summaryField || !generateSummaryBtn) return;
+
+        if (summaryField.value.trim()) {
+            generateSummaryBtn.textContent = "✨ Improve with AI";
+        } else {
+            generateSummaryBtn.textContent = "✨ Generate with AI";
+        }
+    }
+
+    async function generateSummaryWithAI() {
+        const existingSummary = summaryField ? summaryField.value.trim() : "";
+
+        const formData = new FormData();
+        formData.append("existing_summary", existingSummary);
+
+        const oldText = generateSummaryBtn.textContent;
+        generateSummaryBtn.disabled = true;
+        generateSummaryBtn.textContent = "Generating...";
+
+        try {
+            const response = await fetch("/api/generate-summary", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to generate summary.");
+            }
+
+            if (summaryField) {
+                summaryField.value = data.professional_summary || "";
+            }
+
+            updateSummaryButtonText();
+        } catch (error) {
+            alert(error.message || "Something went wrong while generating summary.");
+        } finally {
+            generateSummaryBtn.disabled = false;
+            generateSummaryBtn.textContent = oldText;
+            updateSummaryButtonText();
+        }
+    }
+
+    if (summaryField) {
+        summaryField.addEventListener("input", updateSummaryButtonText);
+        updateSummaryButtonText();
+    }
+
+    if (generateSummaryBtn) {
+        generateSummaryBtn.addEventListener("click", generateSummaryWithAI);
+    }
+</script>
+
+<script src="/static/common.js"></script>
 </body>
 </html>

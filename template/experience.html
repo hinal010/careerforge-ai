@@ -196,7 +196,7 @@
                             >{{ edit_experience.description if edit_experience else '' }}</textarea>
 
                             <div class="ai-action">
-                                <button type="button" class="ai-btn" disabled>✨ Generate with AI</button>
+                                <button type="button" class="ai-btn" id="generateAiDescriptionBtn">✨ Generate with AI</button>
                             </div>
                         </div>
 
@@ -297,38 +297,126 @@
     </div>
 
     <script>
-        const jobTitleSelect = document.getElementById("job_title");
-        const customJobTitleGroup = document.getElementById("customJobTitleGroup");
-        const currentlyWorkingCheckbox = document.getElementById("currently_working");
-        const endMonthInput = document.getElementById("end_month");
+    const jobTitleSelect = document.getElementById("job_title");
+    const customJobTitleGroup = document.getElementById("customJobTitleGroup");
+    const currentlyWorkingCheckbox = document.getElementById("currently_working");
+    const endMonthInput = document.getElementById("end_month");
 
-        function handleCustomJobTitle() {
-            if (jobTitleSelect.value === "other") {
-                customJobTitleGroup.style.display = "block";
-            } else {
-                customJobTitleGroup.style.display = "none";
+    const customJobTitleInput = document.getElementById("custom_job_title");
+    const experienceTypeSelect = document.getElementById("experience_type");
+    const companyNameInput = document.getElementById("company_name");
+    const locationInput = document.getElementById("location");
+    const descriptionField = document.getElementById("description");
+    const generateAiBtn = document.getElementById("generateAiDescriptionBtn");
+
+    function handleCustomJobTitle() {
+        if (!jobTitleSelect || !customJobTitleGroup) return;
+
+        if (jobTitleSelect.value === "other") {
+            customJobTitleGroup.style.display = "block";
+        } else {
+            customJobTitleGroup.style.display = "none";
+        }
+    }
+
+    function handleCurrentlyWorking() {
+        if (!currentlyWorkingCheckbox || !endMonthInput) return;
+
+        if (currentlyWorkingCheckbox.checked) {
+            endMonthInput.value = "";
+            endMonthInput.disabled = true;
+        } else {
+            endMonthInput.disabled = false;
+        }
+    }
+
+    function updateAiButtonText() {
+        if (!generateAiBtn || !descriptionField) return;
+
+        if (descriptionField.value.trim()) {
+            generateAiBtn.textContent = "✨ Improve with AI";
+        } else {
+            generateAiBtn.textContent = "✨ Generate with AI";
+        }
+    }
+
+    async function generateDescriptionWithAI() {
+        if (!generateAiBtn || !descriptionField) return;
+
+        const selectedJobTitleText =
+            jobTitleSelect && jobTitleSelect.selectedIndex >= 0
+                ? jobTitleSelect.options[jobTitleSelect.selectedIndex].text
+                : "";
+
+        const selectedExperienceTypeText =
+            experienceTypeSelect && experienceTypeSelect.selectedIndex >= 0
+                ? experienceTypeSelect.options[experienceTypeSelect.selectedIndex].text
+                : "";
+
+        const customJobTitle = customJobTitleInput ? customJobTitleInput.value.trim() : "";
+        const companyName = companyNameInput ? companyNameInput.value.trim() : "";
+        const location = locationInput ? locationInput.value.trim() : "";
+        const userInput = descriptionField.value.trim();
+
+        if (!selectedJobTitleText && !customJobTitle && !companyName && !userInput) {
+            alert("Please enter job title, company name, or some description notes first.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("job_title", selectedJobTitleText);
+        formData.append("custom_job_title", customJobTitle);
+        formData.append("experience_type", selectedExperienceTypeText);
+        formData.append("company_name", companyName);
+        formData.append("location", location);
+        formData.append("user_input", userInput);
+
+        const oldText = generateAiBtn.textContent;
+        generateAiBtn.disabled = true;
+        generateAiBtn.textContent = "Generating...";
+
+        try {
+            const response = await fetch("/api/generate-experience-description", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to generate description.");
             }
-        }
 
-        function handleCurrentlyWorking() {
-            if (currentlyWorkingCheckbox.checked) {
-                endMonthInput.value = "";
-                endMonthInput.disabled = true;
-            } else {
-                endMonthInput.disabled = false;
-            }
+            descriptionField.value = data.description || "";
+            updateAiButtonText();
+        } catch (error) {
+            alert(error.message || "Something went wrong while generating description.");
+        } finally {
+            generateAiBtn.disabled = false;
+            generateAiBtn.textContent = oldText;
+            updateAiButtonText();
         }
+    }
 
-        if (jobTitleSelect) {
-            jobTitleSelect.addEventListener("change", handleCustomJobTitle);
-            handleCustomJobTitle();
-        }
+    if (jobTitleSelect) {
+        jobTitleSelect.addEventListener("change", handleCustomJobTitle);
+        handleCustomJobTitle();
+    }
 
-        if (currentlyWorkingCheckbox) {
-            currentlyWorkingCheckbox.addEventListener("change", handleCurrentlyWorking);
-            handleCurrentlyWorking();
-        }
-    </script>
+    if (currentlyWorkingCheckbox) {
+        currentlyWorkingCheckbox.addEventListener("change", handleCurrentlyWorking);
+        handleCurrentlyWorking();
+    }
+
+    if (descriptionField) {
+        descriptionField.addEventListener("input", updateAiButtonText);
+        updateAiButtonText();
+    }
+
+    if (generateAiBtn) {
+        generateAiBtn.addEventListener("click", generateDescriptionWithAI);
+    }
+</script>
 <script src="/static/common.js"></script>
 </body>
 </html>

@@ -357,39 +357,55 @@ def save_skills(
     user_id,
     job_role_id=None,
     custom_job_role=None,
+    core_skills="",
+    soft_skills="",
+    tools_technologies="",
     languages="",
-    frameworks="",
-    tools="",
-    cloud_platforms="",
-    databases="",
-    methodologies="",
-    soft_skills=""
+    missing_skills_suggestions=""
 ):
     cur = conn.cursor()
+
     cur.execute("SELECT id FROM user_skills WHERE user_id = ?", (user_id,))
     row = cur.fetchone()
 
     if row:
         cur.execute("""
             UPDATE user_skills
-            SET job_role_id = ?, custom_job_role = ?, languages = ?, frameworks = ?,
-                tools = ?, cloud_platforms = ?, databases = ?, methodologies = ?,
-                soft_skills = ?
+            SET job_role_id = ?,
+                custom_job_role = ?,
+                core_skills = ?,
+                soft_skills = ?,
+                tools_technologies = ?,
+                languages = ?,
+                missing_skills_suggestions = ?
             WHERE user_id = ?
         """, (
-            job_role_id, custom_job_role, languages, frameworks,
-            tools, cloud_platforms, databases, methodologies,
-            soft_skills, user_id
+            job_role_id,
+            custom_job_role,
+            core_skills,
+            soft_skills,
+            tools_technologies,
+            languages,
+            missing_skills_suggestions,
+            user_id
         ))
     else:
         cur.execute("""
             INSERT INTO user_skills
-            (user_id, job_role_id, custom_job_role, languages, frameworks,
-             tools, cloud_platforms, databases, methodologies, soft_skills)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (user_id, job_role_id, custom_job_role,
+             core_skills, soft_skills,
+             tools_technologies, languages,
+             missing_skills_suggestions)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            user_id, job_role_id, custom_job_role, languages, frameworks,
-            tools, cloud_platforms, databases, methodologies, soft_skills
+            user_id,
+            job_role_id,
+            custom_job_role,
+            core_skills,
+            soft_skills,
+            tools_technologies,
+            languages,
+            missing_skills_suggestions
         ))
 
     conn.commit()
@@ -405,6 +421,7 @@ def get_skills(user_id):
         LEFT JOIN job_title_master j ON us.job_role_id = j.id
         WHERE us.user_id = ?
     """, (user_id,))
+
     row = cur.fetchone()
     return dict(row) if row else None
 
