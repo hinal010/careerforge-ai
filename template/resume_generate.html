@@ -4,46 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generate Resume | CareerForge AI</title>
+
+    <!-- SAME fonts as preview -->
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="/static/resume_preview.css">
 
+    {% if pdf_mode %}
+    <link rel="stylesheet" href="/static/resume_pdf.css">
+    {% endif %}
+
     <style>
-        @media print {
-            .topbar,
-            .preview-header,
-            .preview-actions-bar {
-                display: none !important;
-            }
-
-            body,
-            .page-wrapper,
-            .preview-main,
-            .resume-shell {
-                background: white !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                box-shadow: none !important;
-            }
-
-            .resume-paper {
-                width: 210mm !important;
-                min-height: 297mm !important;
-                margin: 0 auto !important;
-                box-shadow: none !important;
-                border: none !important;
-            }
-
-            @page {
-                size: A4;
-                margin: 10mm;
-            }
+        @page {
+            size: A4;
+            margin: 10mm;
         }
     </style>
 </head>
 <body>
 
-    <div class="page-wrapper">
+    <div class="page-wrapper {% if pdf_mode %}pdf-mode{% endif %}">
 
+        {% if not pdf_mode %}
         <header class="topbar">
             <div class="logo"><span>Career</span>Forge AI</div>
             <div class="topbar-actions">
@@ -77,10 +59,11 @@
                 Download PDF
             </button>
         </section>
+        {% endif %}
 
         <main class="preview-main">
             <div class="resume-shell">
-                <div class="resume-paper template-{{ selected_template_name }}" id="resumePaper">
+                <div class="resume-paper template-{{ selected_template_name }}">
                     {% include template_file %}
                 </div>
             </div>

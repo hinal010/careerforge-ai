@@ -212,6 +212,23 @@ def generate_professional_summary(
 ) -> str:
     existing_summary = (existing_summary or "").strip()
 
+    def to_dict(row):
+        if row is None:
+            return None
+        if isinstance(row, dict):
+            return row
+        try:
+            return dict(row)
+        except Exception:
+            return row
+
+    profile = to_dict(profile)
+    skills = to_dict(skills)
+    educations = [to_dict(edu) for edu in (educations or [])]
+    experiences = [to_dict(exp) for exp in (experiences or [])]
+    projects = [to_dict(project) for project in (projects or [])]
+    certifications = [to_dict(cert) for cert in (certifications or [])]
+
     # ---------------------------
     # Profile
     # ---------------------------
@@ -224,23 +241,13 @@ Profile:
 - Country: {profile.get("country", "")}
 """
 
-        # ---------------------------
+    # ---------------------------
     # Education
     # ---------------------------
     education_lines = []
-    for edu in educations or []:
-        degree_value = (
-            edu.get("degree_name")
-            or edu.get("custom_degree")
-            or ""
-        )
-
-        course_value = (
-            edu.get("course_name")
-            or edu.get("custom_course")
-            or ""
-        )
-
+    for edu in educations:
+        degree_value = edu.get("degree_name") or edu.get("custom_degree") or ""
+        course_value = edu.get("course_name") or edu.get("custom_course") or ""
         institution_value = (
             edu.get("institute_name")
             or edu.get("institution_name")
@@ -268,7 +275,7 @@ Profile:
     experience_lines = []
     meaningful_experience_count = 0
 
-    for exp in experiences or []:
+    for exp in experiences:
         job_title = exp.get("job_title_name") or exp.get("custom_job_title") or ""
         company_name = exp.get("company_name", "") or ""
         description = exp.get("description", "") or ""
@@ -284,7 +291,9 @@ Profile:
             f"Description: {description}"
         )
 
-    experience_text = "Experience:\n" + ("\n".join(experience_lines) if experience_lines else "- Not provided")
+    experience_text = "Experience:\n" + (
+        "\n".join(experience_lines) if experience_lines else "- Not provided"
+    )
 
     # ---------------------------
     # Skills + Target Role
@@ -309,23 +318,27 @@ Skills:
     # Projects
     # ---------------------------
     project_lines = []
-    for project in projects or []:
+    for project in projects:
         project_lines.append(
             f"- Title: {project.get('project_title', '')}, Technologies: {project.get('technologies', '')}, "
             f"Description: {project.get('description', '')}"
         )
-    project_text = "Projects:\n" + ("\n".join(project_lines) if project_lines else "- Not provided")
+    project_text = "Projects:\n" + (
+        "\n".join(project_lines) if project_lines else "- Not provided"
+    )
 
     # ---------------------------
     # Certifications
     # ---------------------------
     certification_lines = []
-    for cert in certifications or []:
+    for cert in certifications:
         certification_lines.append(
             f"- Certificate: {cert.get('certificate_name', '')}, Organization: {cert.get('organization', '')}, "
             f"Date: {cert.get('certificate_date', '')}"
         )
-    certification_text = "Certifications:\n" + ("\n".join(certification_lines) if certification_lines else "- Not provided")
+    certification_text = "Certifications:\n" + (
+        "\n".join(certification_lines) if certification_lines else "- Not provided"
+    )
 
     # ---------------------------
     # Candidate Type Logic
@@ -374,9 +387,6 @@ Target Role Instructions:
 - Create a general professional summary based on the candidate's strongest profile details.
 """
 
-    # ---------------------------
-    # Base Context
-    # ---------------------------
     base_context = f"""
 You are a professional resume writing assistant.
 
@@ -405,9 +415,6 @@ Important Rules:
 {certification_text}
 """
 
-    # ---------------------------
-    # Improve existing summary
-    # ---------------------------
     if existing_summary:
         prompt = f"""
 {base_context}

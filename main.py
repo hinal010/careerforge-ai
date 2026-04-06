@@ -110,7 +110,7 @@ oauth.register(
 )
 app.add_middleware(
     SessionMiddleware,
-    secret_key=SESSION_SECRET_KEY or "careerforge_session_secret",
+    secret_key=SESSION_SECRET_KEY,
     max_age=60 * 60 * 24 * 7   # 7 days
 )
 
@@ -305,6 +305,27 @@ def admin_dashboard_stats():
         "top_roles": top_roles,
     }
 
+def keep_latest_3_resumes(user_id: int):
+    resumes = get_resume_history(user_id)
+
+    # already usually latest first, but safe sort
+    resumes = sorted(resumes, key=lambda x: x["id"], reverse=True)
+
+    if len(resumes) > 3:
+        old_resumes = resumes[3:]
+
+        for res in old_resumes:
+            # delete files also
+            pdf_path = static_url_to_local_path(res.get("pdf_file", ""))
+            if pdf_path and pdf_path.exists():
+                pdf_path.unlink()
+
+            html_path = static_url_to_local_path(res.get("html_file", ""))
+            if html_path and html_path.exists():
+                html_path.unlink()
+
+            # delete from DB
+            delete_resume_history(res["id"], user_id)
 
 # =========================================================
 # PUBLIC ROUTES
@@ -333,7 +354,7 @@ def register_page(request: Request):
         "register.html",
         {
             "request": request,
-             "user": user
+            "user": user
 
         }
     )
@@ -1256,7 +1277,8 @@ def use_template_page(
             "certifications": certifications,
             "saved_summary": summary_row["professional_summary"] if summary_row else "",
             "selected_template_name": template,
-            "template_file": template_file
+            "template_file": template_file,
+            "pdf_mode": False
         }
     )
 # =========================================================
@@ -1304,17 +1326,11 @@ def generate_pdf(request: Request):
         "certifications": certifications,
         "saved_summary": summary_row["professional_summary"] if summary_row else "",
         "selected_template_name": template_name,
-        "template_file": template_file
+        "template_file": template_file,
+        "pdf_mode": True
     })
 
-    css_file = STATIC_DIR / "resume_preview.css"
-
-    pdf_bytes = HTML(
-        string=full_html,
-        base_url=str(request.base_url)
-    ).write_pdf(
-        stylesheets=[CSS(filename=str(css_file))]
-    )
+    css_file = STATIC_DIR / "resume_pdf.css"
 
     full_name = (
         profile["full_name"]
@@ -1323,32 +1339,29 @@ def generate_pdf(request: Request):
     ).strip().replace(" ", "_")
 
     unique_id = uuid.uuid4().hex[:12]
-
-    html_filename = f"{full_name}_{template_name}_{unique_id}.html"
     pdf_filename = f"{full_name}_{template_name}_{unique_id}.pdf"
-
-    html_path = GENERATED_RESUME_DIR / html_filename
     pdf_path = GENERATED_RESUME_DIR / pdf_filename
 
-    with open(html_path, "w", encoding="utf-8") as f:
-        f.write(full_html)
+    HTML(
+        string=full_html,
+        base_url=str(BASE_DIR)
+    ).write_pdf(
+        target=str(pdf_path),
+        stylesheets=[CSS(filename=str(css_file))]
+    )
 
-    with open(pdf_path, "wb") as f:
-        f.write(pdf_bytes)
-
-    html_static_url = f"/static/generated_resumes/{html_filename}"
     pdf_static_url = f"/static/generated_resumes/{pdf_filename}"
-
     resume_name = profile["full_name"] if profile and profile.get("full_name") else user["full_name"]
 
     add_resume_history(
         user["id"],
         resume_name,
         template_name,
-        html_static_url,
-        pdf_static_url
+        " ",
+        pdf_static_url,
+        
     )
-
+    keep_latest_3_resumes(user["id"])
     return FileResponse(
         path=str(pdf_path),
         filename=f"{full_name}.pdf",
@@ -1362,25 +1375,12 @@ def view_saved_resume(request: Request, history_id: int):
 
     history = get_resume_history_by_id(history_id, user["id"])
     if not history:
-        return RedirectResponse(url="/my_profile", status_code=303)
+        return HTMLResponse("<h2>Resume not found</h2>", status_code=404)
 
     file_path = static_url_to_local_path(history["html_file"])
     if not file_path or not file_path.exists():
-        return RedirectResponse(url="/my_profile?msg=resume_not_found", status_code=303)
+        return HTMLResponse("<h2>Saved resume file not found</h2>", status_code=404)
 
-@app.get("/resume_history/view/{history_id}")
-def view_saved_resume(request: Request, history_id: int):
-    user = require_login(request)
-    if isinstance(user, RedirectResponse):
-        return user
-
-    history = get_resume_history_by_id(history_id, user["id"])
-    if not history:
-        return RedirectResponse(url="/my_profile", status_code=303)
-
-    file_path = static_url_to_local_path(history["html_file"])
-    if not file_path or not file_path.exists():
-        return RedirectResponse(url="/my_profile?msg=resume_not_found", status_code=303)
     return FileResponse(str(file_path), media_type="text/html")
 
 @app.get("/resume_history/download/{history_id}")
@@ -1416,11 +1416,7 @@ def remove_saved_resume(request: Request, history_id: int):
     if not history:
         return RedirectResponse(url="/my_profile", status_code=303)
 
-    html_path = static_url_to_local_path(history["html_file"])
     pdf_path = static_url_to_local_path(history["pdf_file"])
-
-    if html_path and html_path.exists():
-        html_path.unlink()
 
     if pdf_path and pdf_path.exists():
         pdf_path.unlink()
