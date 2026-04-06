@@ -74,7 +74,7 @@
 
                         <div class="form-group">
                             <label for="degree">Degree</label>
-                            <select id="degree" name="degree" required>
+                            <select id="degree" name="degree" required onchange="toggleCustomField('degree')">
                                 <option value="">Select Degree</option>
                                 {% for degree in degree_list %}
                                     <option value="{{ degree.id }}"
@@ -82,12 +82,26 @@
                                         {{ degree.degree_name }}
                                     </option>
                                 {% endfor %}
+                                <option value="other"
+                                    {% if edit_education and edit_education.custom_degree %}selected{% endif %}>
+                                    Other
+                                </option>
                             </select>
                         </div>
 
+                        <div class="form-group" id="degree_custom_group" style="display:none;">
+                            <label for="custom_degree">Custom Degree</label>
+                            <input
+                                type="text"
+                                id="custom_degree"
+                                name="custom_degree"
+                                placeholder="Enter your degree"
+                                value="{{ edit_education.custom_degree if edit_education else '' }}"
+                            >
+                        </div>
                         <div class="form-group">
                             <label for="course">Course</label>
-                            <select id="course" name="course" required>
+                            <select id="course" name="course" required onchange="toggleCustomField('course')">
                                 <option value="">Select Course</option>
                                 {% for course in course_list %}
                                     <option value="{{ course.id }}"
@@ -95,31 +109,50 @@
                                         {{ course.course_name }}
                                     </option>
                                 {% endfor %}
+                                <option value="other"
+                                    {% if edit_education and edit_education.custom_course %}selected{% endif %}>
+                                    Other
+                                </option>
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="institution">Institution</label>
-                            <select id="institution" name="institution" required>
-                                <option value="">Select Institution</option>
-                                {% for institution in institution_list %}
-                                    <option value="{{ institution.id }}"
-                                        {% if edit_education and edit_education.institution_id == institution.id %}selected{% endif %}>
-                                        {{ institution.institute_name }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="location">Location</label>
+                        <div class="form-group" id="course_custom_group" style="display:none;">
+                            <label for="custom_course">Custom Course</label>
                             <input
                                 type="text"
-                                id="location"
-                                name="location"
-                                placeholder="Enter institution location"
-                                value="{{ edit_education.location if edit_education else '' }}"
+                                id="custom_course"
+                                name="custom_course"
+                                placeholder="Enter your course"
+                                value="{{ edit_education.custom_course if edit_education else '' }}"
                             >
+                        </div>
+
+                        <div class="form-group">
+                                <label for="institution">Institution</label>
+                                <select id="institution" name="institution" required onchange="toggleCustomField('institution')">
+                                    <option value="">Select Institution</option>
+                                    {% for institution in institution_list %}
+                                        <option value="{{ institution.id }}"
+                                            {% if edit_education and edit_education.institution_id == institution.id %}selected{% endif %}>
+                                            {{ institution.institute_name }}
+                                        </option>
+                                    {% endfor %}
+                                    <option value="other"
+                                        {% if edit_education and edit_education.custom_institution %}selected{% endif %}>
+                                        Other
+                                    </option>
+                                </select>
+                        </div>
+
+                        <div class="form-group" id="institution_custom_group" style="display:none;">
+                             <label for="custom_institution">Custom Institution</label>
+                                <input
+                                    type="text"
+                                    id="custom_institution"
+                                    name="custom_institution"
+                                    placeholder="Enter your institution name"
+                                    value="{{ edit_education.custom_institution if edit_education else '' }}"
+                                    >
                         </div>
 
                         <div class="form-group">
@@ -232,6 +265,29 @@
             </div>
         </main>
     </div>
+<script>
+function toggleCustomField(fieldName) {
+    const select = document.getElementById(fieldName);
+    const customGroup = document.getElementById(fieldName + "_custom_group");
+    const customInput = document.getElementById("custom_" + fieldName);
 
+    if (!select || !customGroup || !customInput) return;
+
+    if (select.value === "other") {
+        customGroup.style.display = "block";
+        customInput.required = true;
+    } else {
+        customGroup.style.display = "none";
+        customInput.required = false;
+        customInput.value = customInput.value; 
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    toggleCustomField("degree");
+    toggleCustomField("course");
+    toggleCustomField("institution");
+});
+</script>
 </body>
 </html>

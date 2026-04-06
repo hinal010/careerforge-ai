@@ -1,12 +1,13 @@
 import shutil
 from pathlib import Path
-
+import uuid
 from fastapi import FastAPI, Request, Form, File, UploadFile, Query
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, Response, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 from authlib.integrations.starlette_client import OAuth, OAuthError
+from weasyprint import HTML,CSS
 from auth_config import (
     SESSION_SECRET_KEY,
     ADMIN_EMAIL,
@@ -82,6 +83,11 @@ from crud import (
     get_all_users,
     search_users,
     get_admin_user_detail,
+
+    add_resume_history,
+    get_resume_history,
+    get_resume_history_by_id,
+    delete_resume_history,
 )
 from ai_service import (
     generate_experience_description,
@@ -114,6 +120,8 @@ TEMPLATE_DIR = BASE_DIR / "template"
 UPLOAD_DIR = STATIC_DIR / "uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
+GENERATED_RESUME_DIR = STATIC_DIR / "generated_resumes"
+GENERATED_RESUME_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
@@ -162,6 +170,11 @@ def save_upload_file(upload_file: UploadFile):
 
     return f"/static/uploads/{file_name}"
 
+def static_url_to_local_path(static_url: str):
+    if not static_url.startswith("/static/"):
+        return None
+    relative_path = static_url.replace("/static/", "", 1)
+    return STATIC_DIR / relative_path
 
 def get_resume_status(user_id: int):
     profile = get_user_profile(user_id)
@@ -226,8 +239,7 @@ def admin_dashboard_stats():
     total_job_titles = cur.execute("SELECT COUNT(*) FROM job_title_master").fetchone()[0]
     total_degrees = cur.execute("SELECT COUNT(*) FROM degree_master").fetchone()[0]
     total_courses = cur.execute("SELECT COUNT(*) FROM course_master").fetchone()[0]
-    total_resumes = cur.execute("SELECT COUNT(*) FROM selected_template").fetchone()[0]
-
+    total_resumes = cur.execute("SELECT COUNT(*) FROM resume_history").fetchone()[0]
     recent_raw = cur.execute("""
         SELECT id, username, full_name, email
         FROM users
@@ -315,11 +327,14 @@ def index(request: Request):
 # =========================================================
 @app.get("/register", response_class=HTMLResponse)
 def register_page(request: Request):
+    user = get_current_user(request)
     return templates.TemplateResponse(
         request,
         "register.html",
         {
-            "request": request
+            "request": request,
+             "user": user
+
         }
     )
 
@@ -349,11 +364,13 @@ def register_user(
 
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
+    user = get_current_user(request)
     return templates.TemplateResponse(
         request,
         "login.html",
         {
             "request": request,
+            "user": user,
             "msg": request.query_params.get("msg"),
             "error": request.query_params.get("error")
         }
@@ -491,23 +508,25 @@ def save_profile(
     )
 
     return RedirectResponse(url="/education_detail?msg=profile_saved", status_code=303)
-@app.get("/my-profile", response_class=HTMLResponse)
+@app.get("/my_profile", response_class=HTMLResponse)
 def my_profile_page(request: Request):
     user = require_login(request)
     if isinstance(user, RedirectResponse):
         return user
 
     profile = get_user_profile(user["id"])
+    resume_history = get_resume_history(user["id"])
 
     return templates.TemplateResponse(
+        request,
         "my_profile.html",
         {
             "request": request,
             "user": user,
-            "profile": profile
+            "profile": profile,
+            "resume_history": resume_history
         }
     )
-
 # =========================================================
 # EDUCATION
 # =========================================================
@@ -548,9 +567,16 @@ def education_page(
 def save_education_detail(
     request: Request,
     education_id: int | None = Form(None),
-    degree: int = Form(...),
-    course: int = Form(...),
-    institution: int = Form(...),
+
+    degree: str = Form(""),
+    custom_degree: str = Form(""),
+
+    course: str = Form(""),
+    custom_course: str = Form(""),
+
+    institution: str = Form(""),
+    custom_institution: str = Form(""),
+
     location: str = Form(""),
     start_month: str = Form(...),
     end_month: str = Form(""),
@@ -560,14 +586,25 @@ def save_education_detail(
     if isinstance(user, RedirectResponse):
         return user
 
+    degree_id = None if degree == "other" or degree == "" else int(degree)
+    course_id = None if course == "other" or course == "" else int(course)
+    institution_id = None if institution == "other" or institution == "" else int(institution)
+
+    custom_degree = custom_degree.strip() if degree == "other" else ""
+    custom_course = custom_course.strip() if course == "other" else ""
+    custom_institution = custom_institution.strip() if institution == "other" else ""
+
     if education_id:
         existing = get_education_by_id(education_id, user["id"])
         if existing:
             update_education(
                 education_id,
-                degree,
-                course,
-                institution,
+                degree_id,
+                custom_degree,
+                course_id,
+                custom_course,
+                institution_id,
+                custom_institution,
                 location,
                 start_month,
                 end_month,
@@ -577,9 +614,12 @@ def save_education_detail(
 
     add_education(
         user["id"],
-        degree,
-        course,
-        institution,
+        degree_id,
+        custom_degree,
+        course_id,
+        custom_course,
+        institution_id,
+        custom_institution,
         location,
         start_month,
         end_month,
@@ -587,7 +627,6 @@ def save_education_detail(
     )
 
     return RedirectResponse(url="/education_detail?msg=saved", status_code=303)
-
 
 @app.get("/education/delete/{edu_id}")
 def remove_education(request: Request, edu_id: int):
@@ -784,7 +823,6 @@ def save_skills_detail(
     soft_skills: str = Form(""),
     tools_technologies: str = Form(""),
     languages: str = Form(""),
-    missing_skills_suggestions: str = Form("")
 ):
     user = require_login(request)
     if isinstance(user, RedirectResponse):
@@ -805,8 +843,7 @@ def save_skills_detail(
         core_skills=core_skills,
         soft_skills=soft_skills,
         tools_technologies=tools_technologies,
-        languages=languages,
-        missing_skills_suggestions=missing_skills_suggestions
+        languages=languages
     )
 
     return RedirectResponse(url="/skills?msg=skills_saved", status_code=303)
@@ -1113,25 +1150,33 @@ def choose_template_page(request: Request):
 # RESUME PREVIEW
 # =========================================================
 @app.get("/resume_preview", response_class=HTMLResponse)
-@app.get("/resume-preview", response_class=HTMLResponse)
 def resume_preview_page(
     request: Request,
-    template: str = Query(None),
-    selected: str = Query(None)
+    template: str = Query(None)
 ):
     user = require_login(request)
     if isinstance(user, RedirectResponse):
         return user
 
-    if template and selected == "true":
-        save_selected_template(user["id"], template)
+    template_map = {
+        "classic-edge": "resume_templates/classic_edge.html",
+        "nova-grid": "resume_templates/nova_grid.html",
+        "profile-spotlight": "resume_templates/profile_spotlight.html",
+        "pure-ats": "resume_templates/pure_ats.html",
+        "executive-line": "resume_templates/executive_line.html",
+        "soft-modern": "resume_templates/soft_modern.html",
+    }
 
     selected_row = get_selected_template(user["id"])
-    selected_template_name = (
-        selected_row["template_name"]
-        if selected_row and selected_row.get("template_name")
-        else (template if template else "classic-edge")
-    )
+
+    if template in template_map:
+        selected_template_name = template
+    elif selected_row and selected_row.get("template_name") in template_map:
+        selected_template_name = selected_row["template_name"]
+    else:
+        selected_template_name = "classic-edge"
+
+    template_file = template_map[selected_template_name]
 
     profile = get_user_profile(user["id"])
     educations = get_education(user["id"])
@@ -1157,11 +1202,231 @@ def resume_preview_page(
             "projects": projects,
             "certifications": certifications,
             "saved_summary": summary_row["professional_summary"] if summary_row else "",
-            "selected_template_name": selected_template_name
+            "selected_template_name": selected_template_name,
+            "template_file": template_file
         }
+    )
+@app.get("/use_template", response_class=HTMLResponse)
+def use_template_page(
+    request: Request,
+    template: str = Query(None)
+):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return user
+
+    template_map = {
+        "classic-edge": "resume_templates/classic_edge.html",
+        "nova-grid": "resume_templates/nova_grid.html",
+        "profile-spotlight": "resume_templates/profile_spotlight.html",
+        "pure-ats": "resume_templates/pure_ats.html",
+        "executive-line": "resume_templates/executive_line.html",
+        "soft-modern": "resume_templates/soft_modern.html",
+    }
+
+    if template not in template_map:
+        template = "classic-edge"
+
+    save_selected_template(user["id"], template)
+
+    template_file = template_map[template]
+
+    profile = get_user_profile(user["id"])
+    educations = get_education(user["id"])
+    experiences = get_experience(user["id"])
+    skills = get_skills(user["id"])
+    projects = get_projects(user["id"])
+    certifications = get_certifications(user["id"])
+    summary_row = get_professional_summary(user["id"])
+
+    if skills:
+        skills["job_role_text"] = get_job_role_text_from_skills(skills)
+
+    return templates.TemplateResponse(
+        request,
+        "resume_generate.html",
+        {
+            "request": request,
+            "user": user,
+            "profile": profile,
+            "educations": educations,
+            "experiences": experiences,
+            "skills": skills,
+            "projects": projects,
+            "certifications": certifications,
+            "saved_summary": summary_row["professional_summary"] if summary_row else "",
+            "selected_template_name": template,
+            "template_file": template_file
+        }
+    )
+# =========================================================
+# generate_pdf
+# =========================================================
+@app.get("/generate_pdf")
+def generate_pdf(request: Request):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return user
+
+    selected = get_selected_template(user["id"])
+
+    template_map = {
+        "classic-edge": "resume_templates/classic_edge.html",
+        "nova-grid": "resume_templates/nova_grid.html",
+        "profile-spotlight": "resume_templates/profile_spotlight.html",
+        "pure-ats": "resume_templates/pure_ats.html",
+        "executive-line": "resume_templates/executive_line.html",
+        "soft-modern": "resume_templates/soft_modern.html",
+    }
+
+    template_name = selected["template_name"] if selected else "classic-edge"
+    template_file = template_map.get(template_name, "resume_templates/classic_edge.html")
+
+    profile = get_user_profile(user["id"])
+    educations = get_education(user["id"])
+    experiences = get_experience(user["id"])
+    skills = get_skills(user["id"])
+    projects = get_projects(user["id"])
+    certifications = get_certifications(user["id"])
+    summary_row = get_professional_summary(user["id"])
+
+    if skills:
+        skills["job_role_text"] = get_job_role_text_from_skills(skills)
+
+    full_html = templates.get_template("resume_generate.html").render({
+        "request": request,
+        "user": user,
+        "profile": profile,
+        "educations": educations,
+        "experiences": experiences,
+        "skills": skills,
+        "projects": projects,
+        "certifications": certifications,
+        "saved_summary": summary_row["professional_summary"] if summary_row else "",
+        "selected_template_name": template_name,
+        "template_file": template_file
+    })
+
+    css_file = STATIC_DIR / "resume_preview.css"
+
+    pdf_bytes = HTML(
+        string=full_html,
+        base_url=str(request.base_url)
+    ).write_pdf(
+        stylesheets=[CSS(filename=str(css_file))]
+    )
+
+    full_name = (
+        profile["full_name"]
+        if profile and profile.get("full_name")
+        else user["full_name"]
+    ).strip().replace(" ", "_")
+
+    unique_id = uuid.uuid4().hex[:12]
+
+    html_filename = f"{full_name}_{template_name}_{unique_id}.html"
+    pdf_filename = f"{full_name}_{template_name}_{unique_id}.pdf"
+
+    html_path = GENERATED_RESUME_DIR / html_filename
+    pdf_path = GENERATED_RESUME_DIR / pdf_filename
+
+    with open(html_path, "w", encoding="utf-8") as f:
+        f.write(full_html)
+
+    with open(pdf_path, "wb") as f:
+        f.write(pdf_bytes)
+
+    html_static_url = f"/static/generated_resumes/{html_filename}"
+    pdf_static_url = f"/static/generated_resumes/{pdf_filename}"
+
+    resume_name = profile["full_name"] if profile and profile.get("full_name") else user["full_name"]
+
+    add_resume_history(
+        user["id"],
+        resume_name,
+        template_name,
+        html_static_url,
+        pdf_static_url
+    )
+
+    return FileResponse(
+        path=str(pdf_path),
+        filename=f"{full_name}.pdf",
+        media_type="application/pdf"
+    )
+@app.get("/resume_history/view/{history_id}")
+def view_saved_resume(request: Request, history_id: int):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return user
+
+    history = get_resume_history_by_id(history_id, user["id"])
+    if not history:
+        return RedirectResponse(url="/my_profile", status_code=303)
+
+    file_path = static_url_to_local_path(history["html_file"])
+    if not file_path or not file_path.exists():
+        return RedirectResponse(url="/my_profile?msg=resume_not_found", status_code=303)
+
+@app.get("/resume_history/view/{history_id}")
+def view_saved_resume(request: Request, history_id: int):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return user
+
+    history = get_resume_history_by_id(history_id, user["id"])
+    if not history:
+        return RedirectResponse(url="/my_profile", status_code=303)
+
+    file_path = static_url_to_local_path(history["html_file"])
+    if not file_path or not file_path.exists():
+        return RedirectResponse(url="/my_profile?msg=resume_not_found", status_code=303)
+    return FileResponse(str(file_path), media_type="text/html")
+
+@app.get("/resume_history/download/{history_id}")
+def download_saved_resume(request: Request, history_id: int):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return user
+
+    history = get_resume_history_by_id(history_id, user["id"])
+    if not history:
+        return RedirectResponse(url="/my_profile", status_code=303)
+
+    file_path = static_url_to_local_path(history["pdf_file"])
+    if not file_path or not file_path.exists():
+        return RedirectResponse(url="/my_profile?msg=resume_not_found", status_code=303)
+
+    download_name = file_path.name
+
+    return FileResponse(
+        str(file_path),
+        media_type="application/pdf",
+        filename=download_name
     )
 
 
+@app.get("/resume_history/delete/{history_id}")
+def remove_saved_resume(request: Request, history_id: int):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return user
+
+    history = get_resume_history_by_id(history_id, user["id"])
+    if not history:
+        return RedirectResponse(url="/my_profile", status_code=303)
+
+    html_path = static_url_to_local_path(history["html_file"])
+    pdf_path = static_url_to_local_path(history["pdf_file"])
+
+    if html_path and html_path.exists():
+        html_path.unlink()
+
+    if pdf_path and pdf_path.exists():
+        pdf_path.unlink()
+
+    delete_resume_history(history_id, user["id"])
+    return RedirectResponse(url="/my_profile?msg=resume_deleted", status_code=303)
 # =========================================================
 # ADMIN LOGIN / LOGOUT / DASHBOARD
 # =========================================================

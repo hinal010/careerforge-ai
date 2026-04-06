@@ -212,5 +212,29 @@ CREATE TABLE IF NOT EXISTS selected_template (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )
 """)
+def add_column_if_not_exists(table_name, column_def):
+    try:
+        cur.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_def}")
+    except Exception:
+        pass
 
+add_column_if_not_exists("education", "custom_degree TEXT")
+add_column_if_not_exists("education", "custom_course TEXT")
+add_column_if_not_exists("education", "custom_institution TEXT")
+
+# =========================
+# RESUME HISTORY TABLE
+# =========================
+cur.execute("""
+CREATE TABLE IF NOT EXISTS resume_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    resume_name TEXT NOT NULL,
+    template_name TEXT NOT NULL,
+    html_file TEXT NOT NULL,
+    pdf_file TEXT NOT NULL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)
+""")
 conn.commit()

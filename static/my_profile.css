@@ -233,3 +233,125 @@ body {
 .btn-secondary:hover {
   background: #f1f5f9;
 }
+.resume-history-section {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.history-header h2 {
+  margin: 0 0 8px;
+  font-family: 'Sora', sans-serif;
+  font-size: 2rem;
+}
+
+.history-header p {
+  margin: 0 0 24px;
+  color: #475569;
+  font-size: 15px;
+}
+
+.resume-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.resume-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.resume-preview {
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.resume-preview iframe {
+  width: 100%;
+  height: 480px;
+  border: none;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);
+}
+
+.resume-card-body {
+  padding: 20px;
+}
+
+.resume-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.resume-card-top h3 {
+  margin: 0;
+  font-family: 'Sora', sans-serif;
+  font-size: 1.5rem;
+}
+
+.template-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.resume-date {
+  margin: 0 0 18px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.resume-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.btn-danger {
+  background: transparent;
+  color: #dc2626;
+  border: none;
+  font-weight: 700;
+}
+
+.btn-danger:hover {
+  text-decoration: underline;
+}
+
+.empty-history {
+  border: 1px dashed #cbd5e1;
+  border-radius: 16px;
+  padding: 36px 20px;
+  text-align: center;
+  background: #f8fafc;
+}
+
+.empty-history-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .resume-preview iframe {
+    height: 340px;
+  }
+
+  .resume-card-top h3 {
+    font-size: 1.2rem;
+  }
+}

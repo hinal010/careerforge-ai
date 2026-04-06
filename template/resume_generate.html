@@ -3,9 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Preview | CareerForge AI</title>
+    <title>Generate Resume | CareerForge AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/resume_preview.css">
+
+    <style>
+        @media print {
+            .topbar,
+            .preview-header,
+            .preview-actions-bar {
+                display: none !important;
+            }
+
+            body,
+            .page-wrapper,
+            .preview-main,
+            .resume-shell {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+            }
+
+            .resume-paper {
+                width: 210mm !important;
+                min-height: 297mm !important;
+                margin: 0 auto !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -13,7 +46,6 @@
 
         <header class="topbar">
             <div class="logo"><span>Career</span>Forge AI</div>
-
             <div class="topbar-actions">
                 <a href="/choose_template" class="back-link">← Back to Templates</a>
             </div>
@@ -21,19 +53,17 @@
 
         <section class="preview-header">
             <div class="preview-header-left">
-                <p class="preview-badge">Resume Preview</p>
-                <h1>Your Resume Template Preview</h1>
+                <p class="preview-badge">Selected Template</p>
+                <h1>Your Resume is Ready</h1>
                 <p class="preview-subtext">
-                    Review how your resume looks in the selected template before finalizing it.
+                    Your template is selected successfully. Now download your resume as PDF.
                 </p>
             </div>
 
             <div class="preview-header-right">
                 <div class="selected-template-box">
                     <span class="selected-label">Selected Template</span>
-                    <strong id="selectedTemplateName">
-                        {{ selected_template_name if selected_template_name else "classic-edge" }}
-                    </strong>
+                    <strong>{{ selected_template_name }}</strong>
                 </div>
             </div>
         </section>
@@ -42,28 +72,21 @@
             <button type="button" class="secondary-btn" onclick="window.location.href='/choose_template'">
                 Change Template
             </button>
-            <button type="button" class="primary-btn" onclick="useTemplate()">
-                Use This Template
+
+            <button type="button" class="primary-btn" onclick="window.location.href='/generate_pdf'">
+                Download PDF
             </button>
         </section>
 
         <main class="preview-main">
             <div class="resume-shell">
-                <div class="resume-paper template-{{ selected_template_name if selected_template_name else 'classic-edge' }}" id="resumePaper">
+                <div class="resume-paper template-{{ selected_template_name }}" id="resumePaper">
                     {% include template_file %}
                 </div>
             </div>
         </main>
 
     </div>
-
-    <script>
-        const templateId = "{{ selected_template_name if selected_template_name else 'classic-edge' }}";
-
-        function useTemplate() {
-            window.location.href = `/use_template?template=${templateId}`;
-        }
-    </script>
 
 </body>
 </html>

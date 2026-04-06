@@ -224,17 +224,43 @@ Profile:
 - Country: {profile.get("country", "")}
 """
 
-    # ---------------------------
+        # ---------------------------
     # Education
     # ---------------------------
     education_lines = []
     for edu in educations or []:
-        education_lines.append(
-            f"- Degree: {edu.get('degree_name', '')}, Course: {edu.get('course_name', '')}, "
-            f"Institution: {edu.get('institution_name', '')}, Location: {edu.get('location', '')}, "
-            f"Start: {edu.get('start_month', '')}, End: {edu.get('end_month', '')}, Grade: {edu.get('grade', '')}"
+        degree_value = (
+            edu.get("degree_name")
+            or edu.get("custom_degree")
+            or ""
         )
-    education_text = "Education:\n" + ("\n".join(education_lines) if education_lines else "- Not provided")
+
+        course_value = (
+            edu.get("course_name")
+            or edu.get("custom_course")
+            or ""
+        )
+
+        institution_value = (
+            edu.get("institute_name")
+            or edu.get("institution_name")
+            or edu.get("custom_institution")
+            or ""
+        )
+
+        education_lines.append(
+            f"- Degree: {degree_value}, "
+            f"Course: {course_value}, "
+            f"Institution: {institution_value}, "
+            f"Location: {edu.get('location', '')}, "
+            f"Start: {edu.get('start_month', '')}, "
+            f"End: {edu.get('end_month', '')}, "
+            f"Grade: {edu.get('grade', '')}"
+        )
+
+    education_text = "Education:\n" + (
+        "\n".join(education_lines) if education_lines else "- Not provided"
+    )
 
     # ---------------------------
     # Experience

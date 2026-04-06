@@ -180,13 +180,49 @@ def update_user_profile(
 # =========================================================
 # EDUCATION
 # =========================================================
-def add_education(user_id, degree, course, institution, location, start_month, end_month, grade):
+def add_education(
+    user_id,
+    degree_id,
+    custom_degree,
+    course_id,
+    custom_course,
+    institution_id,
+    custom_institution,
+    location,
+    start_month,
+    end_month,
+    grade
+):
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO education
-        (user_id, degree_id, course_id, institution_id, location, start_month, end_month, grade)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, (user_id, degree, course, institution, location, start_month, end_month, grade))
+        (
+            user_id,
+            degree_id,
+            custom_degree,
+            course_id,
+            custom_course,
+            institution_id,
+            custom_institution,
+            location,
+            start_month,
+            end_month,
+            grade
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        user_id,
+        degree_id,
+        custom_degree,
+        course_id,
+        custom_course,
+        institution_id,
+        custom_institution,
+        location,
+        start_month,
+        end_month,
+        grade
+    ))
     conn.commit()
 
 
@@ -197,11 +233,14 @@ def get_education(user_id):
             e.id,
             e.user_id,
             e.degree_id,
+            e.custom_degree,
             e.course_id,
+            e.custom_course,
             e.institution_id,
-            d.degree_name,
-            c.course_name,
-            i.institute_name,
+            e.custom_institution,
+            COALESCE(d.degree_name, e.custom_degree) AS degree_name,
+            COALESCE(c.course_name, e.custom_course) AS course_name,
+            COALESCE(i.institute_name, e.custom_institution) AS institute_name,
             e.location,
             e.start_month,
             e.end_month,
@@ -227,14 +266,47 @@ def get_education_by_id(edu_id, user_id):
     return dict(row) if row else None
 
 
-def update_education(edu_id, degree, course, institution, location, start_month, end_month, grade):
+def update_education(
+    edu_id,
+    degree_id,
+    custom_degree,
+    course_id,
+    custom_course,
+    institution_id,
+    custom_institution,
+    location,
+    start_month,
+    end_month,
+    grade
+):
     cur = conn.cursor()
     cur.execute("""
         UPDATE education
-        SET degree_id = ?, course_id = ?, institution_id = ?, location = ?,
-            start_month = ?, end_month = ?, grade = ?
+        SET
+            degree_id = ?,
+            custom_degree = ?,
+            course_id = ?,
+            custom_course = ?,
+            institution_id = ?,
+            custom_institution = ?,
+            location = ?,
+            start_month = ?,
+            end_month = ?,
+            grade = ?
         WHERE id = ?
-    """, (degree, course, institution, location, start_month, end_month, grade, edu_id))
+    """, (
+        degree_id,
+        custom_degree,
+        course_id,
+        custom_course,
+        institution_id,
+        custom_institution,
+        location,
+        start_month,
+        end_month,
+        grade,
+        edu_id
+    ))
     conn.commit()
 
 
@@ -599,7 +671,49 @@ def get_selected_template(user_id):
     row = cur.fetchone()
     return dict(row) if row else None
 
+# =========================================================
+# RESUME HISTORY
+# =========================================================
+def add_resume_history(user_id, resume_name, template_name, html_file, pdf_file):
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO resume_history
+        (user_id, resume_name, template_name, html_file, pdf_file)
+        VALUES (?, ?, ?, ?, ?)
+    """, (user_id, resume_name, template_name, html_file, pdf_file))
+    conn.commit()
+    return cur.lastrowid
 
+
+def get_resume_history(user_id):
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id, user_id, resume_name, template_name, html_file, pdf_file, created_at
+        FROM resume_history
+        WHERE user_id = ?
+        ORDER BY id DESC
+    """, (user_id,))
+    return cur.fetchall()
+
+
+def get_resume_history_by_id(history_id, user_id):
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id, user_id, resume_name, template_name, html_file, pdf_file, created_at
+        FROM resume_history
+        WHERE id = ? AND user_id = ?
+    """, (history_id, user_id))
+    row = cur.fetchone()
+    return dict(row) if row else None
+
+
+def delete_resume_history(history_id, user_id):
+    cur = conn.cursor()
+    cur.execute("""
+        DELETE FROM resume_history
+        WHERE id = ? AND user_id = ?
+    """, (history_id, user_id))
+    conn.commit()
 # =========================================================
 # MASTER TABLES - FOR USER FORMS
 # =========================================================
@@ -899,18 +1013,18 @@ def get_admin_user_detail(user_id):
     """, (user_id,)).fetchone()
 
     education = cur.execute("""
-        SELECT
-            e.*,
-            d.degree_name,
-            c.course_name,
-            i.institute_name
-        FROM education e
-        LEFT JOIN degree_master d ON e.degree_id = d.id
-        LEFT JOIN course_master c ON e.course_id = c.id
-        LEFT JOIN institute_master i ON e.institution_id = i.id
-        WHERE e.user_id = ?
-        ORDER BY e.id DESC
-    """, (user_id,)).fetchall()
+    SELECT
+        e.*,
+        COALESCE(d.degree_name, e.custom_degree) AS degree_name,
+        COALESCE(c.course_name, e.custom_course) AS course_name,
+        COALESCE(i.institute_name, e.custom_institution) AS institute_name
+    FROM education e
+    LEFT JOIN degree_master d ON e.degree_id = d.id
+    LEFT JOIN course_master c ON e.course_id = c.id
+    LEFT JOIN institute_master i ON e.institution_id = i.id
+    WHERE e.user_id = ?
+    ORDER BY e.id DESC
+""", (user_id,)).fetchall()
 
     experience = cur.execute("""
         SELECT

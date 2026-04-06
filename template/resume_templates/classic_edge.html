@@ -1,0 +1,228 @@
+<div class="classic-edge-template">
+
+    <div class="resume-header classic-edge-header">
+        <div class="header-left">
+            <h1 class="resume-name">
+                {{ profile.full_name if profile and profile.full_name else "Your Name" }}
+            </h1>
+
+            <p class="resume-role">
+                {% if skills and skills.job_role_text %}
+                    {{ skills.job_role_text }}
+                {% else %}
+                    Professional Resume
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="resume-contact classic-edge-contact">
+            {% if profile and profile.location %}
+                <p>{{ profile.location }}{% if profile.country %}, {{ profile.country }}{% endif %}</p>
+            {% elif profile and profile.country %}
+                <p>{{ profile.country }}</p>
+            {% endif %}
+
+            {% if profile and profile.email %}
+                <p>{{ profile.email }}</p>
+            {% endif %}
+
+            {% if profile and profile.contact %}
+                <p>{{ profile.contact }}</p>
+            {% endif %}
+
+            {% if profile and profile.linkedin %}
+                <p>{{ profile.linkedin }}</p>
+            {% endif %}
+
+            {% if profile and profile.github %}
+                <p>{{ profile.github }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if saved_summary %}
+    <section class="resume-section">
+        <h2>Professional Summary</h2>
+        <p class="summary-text">{{ saved_summary }}</p>
+    </section>
+    {% endif %}
+
+    {% if experiences and experiences|length > 0 %}
+    <section class="resume-section">
+        <h2>Experience</h2>
+
+        {% for exp in experiences %}
+        <div class="resume-block">
+            <div class="block-top">
+                <div>
+                    <h3>
+                        {% if exp.job_title_text %}
+                            {{ exp.job_title_text }}
+                        {% elif exp.job_title_name %}
+                            {{ exp.job_title_name }}
+                        {% elif exp.custom_job_title %}
+                            {{ exp.custom_job_title }}
+                        {% else %}
+                            Job Title
+                        {% endif %}
+                    </h3>
+
+                    <p class="sub-line">
+                        {{ exp.company_name if exp.company_name else "Company" }}
+                        {% if exp.experience_type_text %}
+                            • {{ exp.experience_type_text }}
+                        {% elif exp.experience_type_name %}
+                            • {{ exp.experience_type_name }}
+                        {% endif %}
+                    </p>
+                </div>
+
+                <span class="date-line">
+                    {{ exp.start_month if exp.start_month else "" }}
+                    {% if exp.start_month or exp.end_month or exp.currently_working %} - {% endif %}
+                    {% if exp.currently_working %}
+                        Present
+                    {% else %}
+                        {{ exp.end_month if exp.end_month else "Present" }}
+                    {% endif %}
+                </span>
+            </div>
+
+            {% if exp.location %}
+                <p class="muted-line">{{ exp.location }}</p>
+            {% endif %}
+
+            {% if exp.description %}
+                <ul class="resume-list">
+                    {% for line in exp.description.split('\n') %}
+                        {% if line.strip() %}
+                            <li>{{ line.strip().lstrip('-• ') }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if projects and projects|length > 0 %}
+    <section class="resume-section">
+        <h2>Projects</h2>
+
+        {% for project in projects %}
+        <div class="resume-block">
+            <div class="block-top">
+                <div>
+                    <h3>{{ project.project_title if project.project_title else "Project Title" }}</h3>
+                    {% if project.technologies %}
+                        <p class="sub-line">{{ project.technologies }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if project.description %}
+                <ul class="resume-list">
+                    {% for line in project.description.split('\n') %}
+                        {% if line.strip() %}
+                            <li>{{ line.strip().lstrip('-• ') }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if skills %}
+    <section class="resume-section">
+        <h2>Skills</h2>
+
+        {% if skills.core_skills %}
+            <p><strong>Core Skills:</strong> {{ skills.core_skills }}</p>
+        {% endif %}
+
+        {% if skills.soft_skills %}
+            <p><strong>Soft Skills:</strong> {{ skills.soft_skills }}</p>
+        {% endif %}
+
+        {% if skills.tools_technologies %}
+            <p><strong>Tools & Technologies:</strong> {{ skills.tools_technologies }}</p>
+        {% endif %}
+
+        {% if skills.languages %}
+            <p><strong>Languages:</strong> {{ skills.languages }}</p>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    {% if educations and educations|length > 0 %}
+    <section class="resume-section">
+        <h2>Education</h2>
+
+        {% for edu in educations %}
+        <div class="resume-block">
+            <div class="block-top">
+                <div>
+                    <h3>
+                        {{ edu.course_text if edu.course_text else edu.course_name if edu.course_name else "Course" }}
+                    </h3>
+
+                    <p class="sub-line">
+                        {% if edu.degree_text %}
+                            {{ edu.degree_text }}
+                        {% elif edu.degree_name %}
+                            {{ edu.degree_name }}
+                        {% endif %}
+
+                        {% if (edu.degree_text or edu.degree_name) and (edu.institution_text or edu.institute_name) %}
+                            •
+                        {% endif %}
+
+                        {{ edu.institution_text if edu.institution_text else edu.institute_name if edu.institute_name else "Institution" }}
+                    </p>
+                </div>
+
+                <span class="date-line">
+                    {{ edu.start_month if edu.start_month else "" }}
+                    {% if edu.start_month or edu.end_month %} - {% endif %}
+                    {{ edu.end_month if edu.end_month else "Present" }}
+                </span>
+            </div>
+
+            {% if edu.location or edu.grade %}
+            <p class="muted-line">
+                {% if edu.location %}{{ edu.location }}{% endif %}
+                {% if edu.location and edu.grade %} • {% endif %}
+                {% if edu.grade %}Grade: {{ edu.grade }}{% endif %}
+            </p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if certifications and certifications|length > 0 %}
+    <section class="resume-section">
+        <h2>Certifications</h2>
+
+        {% for cert in certifications %}
+        <div class="resume-block">
+            <div class="block-top">
+                <div>
+                    <h3>{{ cert.certificate_name }}</h3>
+                    {% if cert.organization %}
+                        <p class="sub-line">{{ cert.organization }}</p>
+                    {% endif %}
+                </div>
+                {% if cert.certificate_date %}
+                    <span class="date-line">{{ cert.certificate_date }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+</div>

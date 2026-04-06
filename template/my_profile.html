@@ -90,6 +90,56 @@
                 Go to Home
             </button>
       </div>
+      <div class="resume-history-section">
+          <div class="history-header">
+            <h2>My Created Resumes</h2>
+            <p>Your saved resumes will appear here automatically whenever you generate a PDF.</p>
+          </div>
+
+          {% if resume_history and resume_history|length > 0 %}
+            <div class="resume-grid">
+              {% for item in resume_history %}
+                <div class="resume-card">
+                  <div class="resume-preview">
+                    <iframe
+                      src="/resume_history/preview/{{ item.id }}#toolbar=0&navpanes=0&scrollbar=0&view=FitH"
+                      loading="lazy"
+                      title="{{ item.resume_name }}"
+                    ></iframe>
+                  </div>
+
+                  <div class="resume-card-body">
+                    <div class="resume-card-top">
+                      <h3>{{ item.resume_name }}</h3>
+                      <span class="template-badge">{{ item.template_name.replace('-', ' ').title() }}</span>
+                    </div>
+
+                    <p class="resume-date">Created: {{ item.created_at }}</p>
+
+                    <div class="resume-card-actions">
+                      <a href="/resume_history/download/{{ item.id }}" class="btn btn-secondary" target="_blank">View</a>
+                      <a href="/resume_history/download/{{ item.id }}" class="btn btn-primary">Download</a>
+                      <a href="/resume_preview?template={{ item.template_name }}" class="btn btn-secondary">Use Again</a>
+                      <a
+                        href="/resume_history/delete/{{ item.id }}"
+                        class="btn btn-danger"
+                        onclick="return confirm('Delete this saved resume?')"
+                      >
+                        Delete
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-history">
+              <div class="empty-history-icon">📄</div>
+              <h3>No resumes created yet</h3>
+              <p>Generate your first PDF resume and it will appear here as a saved card.</p>
+            </div>
+          {% endif %}
+        </div>
     </div>
   </div>
 
