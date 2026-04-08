@@ -7,6 +7,12 @@
     padding: 0;
 }
 
+:root {
+    --border: #ddd8cf;
+    --primary-dark: #1d4ed8;
+    --bg-main: #f5f4f0;
+}
+
 html, body {
     width: 100%;
     overflow-x: hidden;
@@ -14,9 +20,10 @@ html, body {
 
 body {
     font-family: 'DM Sans', sans-serif;
-    background: linear-gradient(135deg, #eef4ff 0%, #f9fbff 45%, #f3f7ff 100%);
+    background: var(--bg-main);
     color: #1f2937;
     min-height: 100vh;
+
 }
 
 /* =========================
@@ -25,25 +32,35 @@ body {
 .page-wrapper {
     width: 100%;
     min-height: 100vh;
-    padding: 28px 20px 40px;
+    padding: 0 0 40px;
 }
 
+.preview-header,
+.preview-actions-bar,
+.preview-main {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 24px;
+    padding-right: 24px;
+}
 /* =========================
    TOPBAR
 ========================= */
 .topbar {
-    max-width: 1400px;
-    margin: 0 auto 24px;
-    padding: 18px 24px;
-    background: rgba(255, 255, 255, 0.84);
-    border: 1px solid rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(12px);
-    border-radius: 22px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 18px;
-    box-shadow: 0 14px 34px rgba(35, 69, 122, 0.10);
+    justify-content: space-between;
+    padding: 0 48px;
+    height: 64px;
+    background: rgba(245, 244, 240, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
 }
 
 .logo {
@@ -84,16 +101,18 @@ body {
 ========================= */
 .preview-header {
     max-width: 1400px;
-    margin: 0 auto 22px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 28px;
-    padding: 30px 34px;
+    margin: 88px auto 22px;   /* important */
+    padding: 0 24px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     gap: 24px;
-    box-shadow: 0 18px 40px rgba(31, 55, 100, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.9);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 16px;
 }
 
 .preview-header-left {
@@ -103,15 +122,20 @@ body {
 .preview-badge {
     display: inline-flex;
     align-items: center;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: #e9f1ff;
-    color: #2451a6;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.7px;
+    gap: 6px;
+
+    background: #eef4ff;
+    color: #1d4ed8;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
-    margin-bottom: 14px;
+
+    padding: 6px 12px;
+    border-radius: 999px;
+
+    border: 1px solid #dbe6ff;
 }
 
 .preview-header h1 {
@@ -128,7 +152,36 @@ body {
     color: #5a6881;
     max-width: 760px;
 }
+.preview-header-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
 
+.selected-template-box {
+    background: #f4f8ff;
+    border: 1px solid #d8e4ff;
+    border-radius: 16px;
+    padding: 14px 18px;
+    min-width: 220px;
+    text-align: right;
+}
+
+.selected-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b7280;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#selectedTemplateName {
+    font-size: 18px;
+    font-weight: 800;
+    color: #10243e;
+}
 /* =========================
    ACTION BAR
 ========================= */

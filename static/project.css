@@ -312,85 +312,77 @@ body {
 .project-item:hover {
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
 }
-
-.project-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 16px;
+.project-item {
+    background: #f8fbff;
+    border: 1px solid #dbe7f5;
+    border-radius: 18px;
+    padding: 24px 28px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    transition: all 0.3s ease;
 }
 
-.project-top h3 {
+.project-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.project-item h3 {
     font-size: 20px;
+    font-weight: 800;
     color: #0f172a;
+    margin-bottom: 10px;
+}
+
+.project-item p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #475569;
     margin-bottom: 8px;
 }
 
-.project-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    background: #dbeafe;
-    color: #1d4ed8;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.action-icons {
-    display: flex;
-    gap: 10px;
-}
-
-.icon-btn {
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: 0.3s ease;
-}
-
-.icon-btn.edit {
-    background: #eff6ff;
-}
-
-.icon-btn.delete {
-    background: #fef2f2;
-}
-
-.icon-btn:hover {
-    transform: translateY(-1px);
-}
-
-.project-meta {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-}
-
-.meta-row {
-    font-size: 14px;
-    color: #475569;
-    line-height: 1.6;
-}
-
-.meta-label {
+.project-item strong {
+    color: #0f172a;
     font-weight: 700;
-    color: #334155;
-    margin-right: 6px;
 }
 
-.description-row {
-    white-space: normal;
-    word-break: break-word;
+.project-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
 }
 
-.full-row {
-    grid-column: 1 / -1;
+.edit-btn,
+.delete-btn {
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 16px;
+    border-radius: 10px;
+    transition: 0.25s ease;
 }
 
+/* Edit */
+.edit-btn {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.edit-btn:hover {
+    background: #dbeafe;
+}
+
+/* Delete */
+.delete-btn {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.delete-btn:hover {
+    background: #fee2e2;
+}
 /* Bottom nav */
 .bottom-nav {
     display: flex;

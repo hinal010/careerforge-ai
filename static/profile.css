@@ -199,7 +199,7 @@ body {
 }
 
 #preview {
-    display: none;
+    display: block;
     width: 140px;
     height: 140px;
     object-fit: cover;

@@ -9,137 +9,189 @@
 </head>
 <body>
 
-    <div class="page-wrapper">
+    <!DOCTYPE html>
 
-        <!-- Top Brand -->
-        <header class="topbar">
-            <div class="logo"><span>Career</span>Forge AI</div>
-        </header>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | CareerForge AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/profile.css">
+</head>
+<body>
 
-        <!-- Progress Bar -->
-<section class="progress-section">
-    <div class="progress-wrap">
 
-        <div class="progress-step {% if step|default(0) > 1 %}completed{% elif step|default(0) == 1 %}active{% endif %}">
-            <span class="step-label">Profile</span>
-            <span class="step-dot"></span>
+<div class="page-wrapper">
+
+    <!-- Top Brand -->
+    <header class="topbar">
+        <div class="logo"><span>Career</span>Forge AI</div>
+    </header>
+
+    <!-- Progress Bar -->
+    <section class="progress-section">
+        <div class="progress-wrap">
+
+            <div class="progress-step {% if step|default(0) > 1 %}completed{% elif step|default(0) == 1 %}active{% endif %}">
+                <span class="step-label">Profile</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 2 %}completed{% elif step|default(0) == 2 %}active{% endif %}">
+                <span class="step-label">Education</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 3 %}completed{% elif step|default(0) == 3 %}active{% endif %}">
+                <span class="step-label">Experience</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 4 %}completed{% elif step|default(0) == 4 %}active{% endif %}">
+                <span class="step-label">Certification</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 5 %}completed{% elif step|default(0) == 5 %}active{% endif %}">
+                <span class="step-label">Project</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 6 %}completed{% elif step|default(0) == 6 %}active{% endif %}">
+                <span class="step-label">Skills</span>
+                <span class="step-dot"></span>
+            </div>
+
+            <div class="progress-step {% if step|default(0) > 7 %}completed{% elif step|default(0) == 7 %}active{% endif %}">
+                <span class="step-label">Summary</span>
+                <span class="step-dot"></span>
+            </div>
+
         </div>
+    </section>
 
-        <div class="progress-step {% if step|default(0) > 2 %}completed{% elif step|default(0) == 2 %}active{% endif %}">
-            <span class="step-label">Education</span>
-            <span class="step-dot"></span>
-        </div>
+    <!-- Main Form Card -->
+    <main class="form-container">
+        <div class="form-card">
+            <div class="form-header">
+                <h1>Profile Details</h1>
+                <p>Add your personal information to begin building your resume.</p>
+            </div>
 
-        <div class="progress-step {% if step|default(0) > 3 %}completed{% elif step|default(0) == 3 %}active{% endif %}">
-            <span class="step-label">Experience</span>
-            <span class="step-dot"></span>
-        </div>
+            <form method="post" action="/profile" enctype="multipart/form-data">
 
-        <div class="progress-step {% if step|default(0) > 4 %}completed{% elif step|default(0) == 4 %}active{% endif %}">
-            <span class="step-label">Certification</span>
-            <span class="step-dot"></span>
-        </div>
+                <!-- Photo Upload -->
+                <div class="photo-section">
+                    <label class="field-label">Profile Photo</label>
 
-        <div class="progress-step {% if step|default(0) > 5 %}completed{% elif step|default(0) == 5 %}active{% endif %}">
-            <span class="step-label">Project</span>
-            <span class="step-dot"></span>
-        </div>
+                    <div class="photo-upload-box">
+                        <div class="photo-preview-area">
 
-        <div class="progress-step {% if step|default(0) > 6 %}completed{% elif step|default(0) == 6 %}active{% endif %}">
-            <span class="step-label">Skills</span>
-            <span class="step-dot"></span>
-        </div>
+                            {% if profile and profile['photo'] %}
+                                <!-- Show image -->
+                                <img id="preview" src="{{ profile['photo'] }}" alt="Photo Preview">
 
-        <div class="progress-step {% if step|default(0) > 7 %}completed{% elif step|default(0) == 7 %}active{% endif %}">
-            <span class="step-label">Summary</span>
-            <span class="step-dot"></span>
-        </div>
+                                <!-- Hide placeholder -->
+                                <div id="photoPlaceholder" class="photo-placeholder" style="display:none;">
+                                    <span class="upload-icon">📷</span>
+                                    <p>Upload your profile photo</p>
+                                    <small>JPG, PNG or JPEG</small>
+                                </div>
 
-    </div>
-</section>
+                            {% else %}
+                                <!-- Hide image -->
+                                <img id="preview" src="" alt="Photo Preview" style="display:none;">
 
-        <!-- Main Form Card -->
-        <main class="form-container">
-            <div class="form-card">
-                <div class="form-header">
-                    <h1>Profile Details</h1>
-                    <p>Add your personal information to begin building your resume.</p>
-                </div>
-
-                <form method="post" action="/profile" enctype="multipart/form-data">
-
-                    <!-- Photo Upload -->
-                    <div class="photo-section">
-                        <label class="field-label">Profile Photo</label>
-
-                        <div class="photo-upload-box">
-                            <div class="photo-preview-area">
-                                <img id="preview" src="" alt="Photo Preview">
+                                <!-- Show placeholder -->
                                 <div id="photoPlaceholder" class="photo-placeholder">
                                     <span class="upload-icon">📷</span>
                                     <p>Upload your profile photo</p>
                                     <small>JPG, PNG or JPEG</small>
                                 </div>
-                            </div>
+                            {% endif %}
 
-                            <div class="photo-upload-action">
-                                <input type="file" id="photo" name="photo" accept="image/*" onchange="previewImage(event)">
-                                <label for="photo" class="upload-btn">Choose Photo</label>
-                            </div>
+                        </div>
+
+                        <div class="photo-upload-action">
+                            <input type="file" id="photo" name="photo" accept="image/*" onchange="previewImage(event)">
+                            <label for="photo" class="upload-btn">Choose Photo</label>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Form Fields -->
-                    <div class="form-grid">
+                <!-- Form Fields -->
+                <div class="form-grid">
 
-                        <div class="form-group">
-                            <label for="full_name">Full Name</label>
-                            <input type="text" id="full_name" name="full_name" placeholder="Enter your full name" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" placeholder="Enter your email address" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="contact">Contact Number</label>
-                            <input type="text" id="contact" name="contact" placeholder="Enter your contact number" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="location">Location</label>
-                            <input type="text" id="location" name="location" placeholder="Enter your city or location" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="country">Country</label>
-                            <input type="text" id="country" name="country" placeholder="Enter your country" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="linkedin">LinkedIn Profile</label>
-                            <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/yourprofile">
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label for="github">GitHub Profile</label>
-                            <input type="url" id="github" name="github" placeholder="https://github.com/yourprofile">
-                        </div>
-
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label for="full_name">Full Name</label>
+                        <input type="text" id="full_name" name="full_name"
+                               value="{{ profile['full_name'] if profile and profile['full_name'] else user['full_name'] }}"
+                               placeholder="Enter your full name" required>
                     </div>
 
-                    <!-- Button -->
-                    <div class="form-actions">
-                        <button type="submit" class="continue-btn">Continue →</button>
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email"
+                               value="{{ profile['email'] if profile and profile['email'] else user['email'] }}"
+                               placeholder="Enter your email address" required>
                     </div>
-                </form>
-            </div>
-        </main>
 
-    </div>
+                    <!-- Contact -->
+                    <div class="form-group">
+                        <label for="contact">Contact Number</label>
+                        <input type="text" id="contact" name="contact"
+                               value="{{ profile['contact'] if profile and profile['contact'] else '' }}"
+                               placeholder="Enter your contact number" required>
+                    </div>
 
-    <script src="/static/common.js"></script>
+                    <!-- Location -->
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location"
+                               value="{{ profile['location'] if profile and profile['location'] else '' }}"
+                               placeholder="Enter your city or location" required>
+                    </div>
+
+                    <!-- Country -->
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <input type="text" id="country" name="country"
+                               value="{{ profile['country'] if profile and profile['country'] else '' }}"
+                               placeholder="Enter your country" required>
+                    </div>
+
+                    <!-- LinkedIn -->
+                    <div class="form-group">
+                        <label for="linkedin">LinkedIn Profile</label>
+                        <input type="url" id="linkedin" name="linkedin"
+                               value="{{ profile['linkedin'] if profile and profile['linkedin'] else '' }}"
+                               placeholder="https://linkedin.com/in/yourprofile">
+                    </div>
+
+                    <!-- GitHub -->
+                    <div class="form-group full-width">
+                        <label for="github">GitHub Profile</label>
+                        <input type="url" id="github" name="github"
+                               value="{{ profile['github'] if profile and profile['github'] else '' }}"
+                               placeholder="https://github.com/yourprofile">
+                    </div>
+
+                </div>
+
+                <!-- Button -->
+                <div class="form-actions">
+                    <button type="submit" class="continue-btn">Continue →</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+</div>
+
+<script src="/static/common.js"></script>
 
 </body>
 </html>

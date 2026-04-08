@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Thumbnail Preview</title>
+    <link rel="stylesheet" href="/static/resume_pdf.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 30px;
+            background: #f3f4f6;
+            font-family: Arial, sans-serif;
+        }
+
+        .thumb-wrap {
+            display: flex;
+            justify-content: center;
+        }
+
+        .resume-paper {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        
+            /* .resume-paper {
+                transform: scale(0.6);
+                transform-origin: top center;
+            } */
+
+    </style>
+</head>
+<body>
+    <div class="thumb-wrap">
+        <div class="resume-paper template-{{ selected_template_name }}">
+            {% include template_file %}
+        </div>
+    </div>
+</body>
+</html>

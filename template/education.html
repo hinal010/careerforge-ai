@@ -189,12 +189,10 @@
 
                     </div>
 
-                    <div class="form-actions">
+                    <div class="top-actions">
                         <button type="submit" class="add-btn">
                             {% if edit_education %}Update Education{% else %}+ Add Education{% endif %}
                         </button>
-
-        
                     </div>
                 </form>
 
@@ -258,8 +256,17 @@
 
                 <!-- Bottom Navigation -->
                 <div class="bottom-nav">
-                    <a href="/profile" class="back-btn">← Back</a>
-                    <a href="/experience" class="continue-btn">Continue →</a>
+
+                    <button type="button" class="back-btn"
+                        onclick="window.location.href='/profile'">
+                        ← Back
+                    </button>
+
+                    <button type="button" class="continue-btn"
+                        onclick="window.location.href='/experience'">
+                        Continue →
+                    </button>
+
                 </div>
 
             </div>

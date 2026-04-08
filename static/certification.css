@@ -275,73 +275,80 @@ body {
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
 }
 
-.certification-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
+.certification-item {
+    background: #f8fbff;
+    border: 1px solid #dbe7f5;
+    border-radius: 18px;
+    padding: 24px 28px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    transition: all 0.3s ease;
+}
+
+.certification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.certification-item-top {
     margin-bottom: 16px;
 }
 
-.certification-top h3 {
+.certification-item h3 {
     font-size: 20px;
+    font-weight: 800;
     color: #0f172a;
+    margin-bottom: 10px;
+}
+
+.certification-item p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #475569;
     margin-bottom: 8px;
 }
 
-.certification-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    background: #dbeafe;
-    color: #1d4ed8;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.action-icons {
-    display: flex;
-    gap: 10px;
-}
-
-.icon-btn {
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: 0.3s ease;
-}
-
-.icon-btn.edit {
-    background: #eff6ff;
-}
-
-.icon-btn.delete {
-    background: #fef2f2;
-}
-
-.icon-btn:hover {
-    transform: translateY(-1px);
-}
-
-.certification-meta {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px 24px;
-}
-
-.meta-row {
-    font-size: 14px;
-    color: #475569;
-}
-
-.meta-label {
+.certification-item strong {
+    color: #0f172a;
     font-weight: 700;
-    color: #334155;
 }
 
+.certification-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.edit-btn,
+.delete-btn {
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 16px;
+    border-radius: 10px;
+    transition: 0.25s ease;
+}
+
+/* Edit */
+.edit-btn {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.edit-btn:hover {
+    background: #dbeafe;
+}
+
+/* Delete */
+.delete-btn {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.delete-btn:hover {
+    background: #fee2e2;
+}
 /* Bottom nav */
 .bottom-nav {
     display: flex;

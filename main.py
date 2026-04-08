@@ -150,6 +150,24 @@ def require_login(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     return user
 
+def is_known_user(request: Request):
+    return request.cookies.get("known_user") == "1"
+
+
+@app.get("/start")
+def start_flow(request: Request):
+    user = get_current_user(request)
+
+    # If already logged in, go directly to profile
+    if user:
+        return RedirectResponse(url="/profile", status_code=303)
+
+    # If this browser already used register/login before, go to login
+    if is_known_user(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    # Brand new browser/user
+    return RedirectResponse(url="/register", status_code=303)
 
 def require_admin(request: Request):
     admin = get_current_admin(request)
@@ -349,13 +367,15 @@ def index(request: Request):
 @app.get("/register", response_class=HTMLResponse)
 def register_page(request: Request):
     user = get_current_user(request)
+    # if user:
+    #     return RedirectResponse(url="/profile", status_code=303)
+
     return templates.TemplateResponse(
         request,
         "register.html",
         {
             "request": request,
             "user": user
-
         }
     )
 
@@ -380,12 +400,21 @@ def register_user(
 
     create_user(username, full_name, email, password)
 
-    return RedirectResponse(url="/login?msg=registered", status_code=303)
-
-
+    response = RedirectResponse(url="/login?msg=registered", status_code=303)
+    response.set_cookie(
+        key="known_user",
+        value="1",
+        max_age=60 * 60 * 24 * 30,   # 30 days
+        httponly=True,
+        samesite="lax"
+    )
+    return response
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
     user = get_current_user(request)
+    # if user:
+    #     return RedirectResponse(url="/profile", status_code=303)
+
     return templates.TemplateResponse(
         request,
         "login.html",
@@ -420,8 +449,15 @@ def login_user(
     request.session["user_email"] = user["email"]
     request.session["user_name"] = user["full_name"]
 
-    return RedirectResponse(url="/profile", status_code=303)
-
+    response = RedirectResponse(url="/profile", status_code=303)
+    response.set_cookie(
+        key="known_user",
+        value="1",
+        max_age=60 * 60 * 24 * 30,   # 30 days
+        httponly=True,
+        samesite="lax"
+    )
+    return response
 
 @app.get("/logout")
 def logout(request: Request):
@@ -1845,3 +1881,116 @@ def admin_remove_job_title(request: Request, job_title_id: int):
 
     delete_job_title(job_title_id)
     return RedirectResponse(url="/admin/job-titles", status_code=303)
+
+
+# @app.get("/template_thumbnail/{template_name}", response_class=HTMLResponse)
+# def template_thumbnail(request: Request, template_name: str):
+#     user = {
+#         "full_name": "John Doe"
+#     }
+
+#     profile = {
+#         "full_name": "John Doe",
+#         "email": "john.doe@gmail.com",
+#         "contact": "+91 98765 43210",
+#         "location": "Ahmedabad",
+#         "country": "India",
+#         "linkedin": "linkedin.com/in/johndoe",
+#         "github": "github.com/johndoe",
+#         "photo": "/static/images/sample-profile.jpeg"
+#     }
+
+#     skills = {
+#         "job_role_text": "Python Developer",
+#         "core_skills": "Python, FastAPI, HTML, CSS, JavaScript",
+#         "soft_skills": "Communication, Teamwork, Problem Solving",
+#         "tools_technologies": "Git, GitHub, MySQL, VS Code",
+#         "languages": "English, Hindi"
+#     }
+
+#     saved_summary = (
+#         "Motivated and detail-oriented software developer with hands-on "
+#         "experience in web development, resume builder systems, and clean UI design. "
+#         "Passionate about building user-friendly and professional applications."
+#     )
+
+#     experiences = [
+#         {
+#             "job_title_text": "Python Developer Intern",
+#             "job_title_name": None,
+#             "custom_job_title": None,
+#             "company_name": "TechNova Solutions",
+#             "experience_type_text": "Internship",
+#             "experience_type_name": None,
+#             "start_month": "Jan 2025",
+#             "end_month": "Apr 2025",
+#             "currently_working": False,
+#             "location": "Ahmedabad",
+#             "description": "Built FastAPI-based web pages.Created resume preview layouts.Improved UI and template styling"
+#         }
+        
+#     ]
+
+#     projects = [
+#         {
+#             "project_title": "CareerForge AI",
+#             "technologies": "FastAPI, Jinja2, MySQL, CSS",
+#             "description": "Developed an AI resume builder system.Implemented multiple resume templates.Added preview and PDF generation"
+#         }
+       
+#     ]
+
+#     educations = [
+#         {
+#             "degree_text": "Bachelor of Engineering",
+#             "degree_name": None,
+#             "course_text": "Computer Engineering",
+#             "course_name": None,
+#             "institution_text": "Silver Oak University",
+#             "institute_name": None,
+#             "start_month": "2022",
+#             "end_month": "2026",
+#             "location": "Ahmedabad",
+#             "grade": "8.5 CGPA"
+#         }
+#     ]
+
+#     certifications = [
+#         {
+#             "certificate_name": "Python for Web Development",
+#             "organization": "Coursera",
+#             "certificate_date": "2025"
+#         }
+#     ]
+
+#     template_map = {
+#         "classic-edge": "resume_templates/classic_edge.html",
+#         "executive-line": "resume_templates/executive_line.html",
+#         "nova-grid": "resume_templates/nova_grid.html",
+#         "profile-spotlight": "resume_templates/profile_spotlight.html",
+#         "pure-ats": "resume_templates/pure_ats.html",
+#         "soft-modern": "resume_templates/soft_modern.html",
+#     }
+
+#     template_file = template_map.get(template_name)
+
+#     if not template_file:
+#         return HTMLResponse("Template not found", status_code=404)
+
+#     return templates.TemplateResponse(
+#         request, 
+#         "thumbnail_preview.html",
+#         {
+#             "request": request,
+#             "user": user,
+#             "profile": profile,
+#             "skills": skills,
+#             "saved_summary": saved_summary,
+#             "experiences": experiences,
+#             "projects": projects,
+#             "educations": educations,
+#             "certifications": certifications,
+#             "template_file": template_file,          # ✅ ADD THIS
+#         "selected_template_name": template_name
+#         }
+#     )
