@@ -43,7 +43,7 @@ def get_user_by_email(email: str):
 def get_user_by_id(user_id: int):
     cur = conn.cursor()
     cur.execute("""
-        SELECT id, username, full_name, email, hashed_password
+        SELECT id, username, full_name, email, hashed_password, is_fresher
         FROM users
         WHERE id = ?
     """, (user_id,))
@@ -51,6 +51,13 @@ def get_user_by_id(user_id: int):
     return dict(row) if row else None
 
 
+def update_fresher_status(user_id: int, is_fresher: int):
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE users SET is_fresher = ? WHERE id = ?",
+        (is_fresher, user_id)
+    )
+    conn.commit()
 # =========================================================
 # ADMIN AUTH
 # =========================================================

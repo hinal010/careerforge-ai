@@ -422,6 +422,29 @@ body {
     transform: translateY(-1px);
 }
 
+.right-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.skip-btn {
+    display: inline-block;
+    padding: 14px 24px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+    transition: 0.3s ease;
+}
+
+.skip-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
 /* Responsive */
 @media (max-width: 900px) {
     .form-grid {

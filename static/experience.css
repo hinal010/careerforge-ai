@@ -449,6 +449,28 @@ body {
 .delete-btn:hover {
     background: #fee2e2;
 }
+.right-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.skip-btn {
+    display: inline-block;
+    padding: 12px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+    transition: all 0.2s ease;
+}
+
+.skip-btn:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
 /* Responsive */
 @media (max-width: 900px) {
     .form-grid,

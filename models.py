@@ -221,6 +221,7 @@ def add_column_if_not_exists(table_name, column_def):
 add_column_if_not_exists("education", "custom_degree TEXT")
 add_column_if_not_exists("education", "custom_course TEXT")
 add_column_if_not_exists("education", "custom_institution TEXT")
+add_column_if_not_exists("users", "is_fresher INTEGER DEFAULT 0")
 
 # =========================
 # RESUME HISTORY TABLE

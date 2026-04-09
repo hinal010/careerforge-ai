@@ -23,6 +23,7 @@ from crud import (
     create_user,
     get_user_by_email,
     get_user_by_id,
+    update_fresher_status,
     
 
     get_user_profile,
@@ -775,6 +776,7 @@ def save_experience_detail(
                 currently_working_value,
                 description
             )
+            update_fresher_status(user["id"], 0)
             return RedirectResponse(url="/experience_detail?msg=updated", status_code=303)
 
     add_experience(
@@ -787,9 +789,10 @@ def save_experience_detail(
         start_month,
         end_month,
         currently_working_value,
-        description
+        description,
+       
     )
-
+    update_fresher_status(user["id"], 0)
     return RedirectResponse(url="/experience_detail?msg=saved", status_code=303)
 
 
@@ -844,6 +847,16 @@ def api_generate_experience_description(
             content={"error": f"AI generation failed: {str(e)}"}
         )
 
+@app.get("/experience/skip")
+def skip_experience(request: Request):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return user
+
+    # Save user as fresher
+    update_fresher_status(user["id"], 1)
+
+    return RedirectResponse(url="/certification", status_code=303)
 # =========================================================
 # SKILLS
 # =========================================================
@@ -1040,7 +1053,13 @@ def api_generate_project_description(
             content={"error": f"AI generation failed: {str(e)}"}
         )
 
+@app.get("/project/skip")
+def skip_project(request: Request):
+    user = require_login(request)
+    if isinstance(user, RedirectResponse):
+        return user
 
+    return RedirectResponse(url="/skills", status_code=303)
 # =========================================================
 # SUMMARY
 # =========================================================
@@ -1246,6 +1265,9 @@ def resume_preview_page(
     if skills:
         skills["job_role_text"] = get_job_role_text_from_skills(skills)
 
+    show_experience = len(experiences) > 0 and user.get("is_fresher", 0) == 0
+    
+
     return templates.TemplateResponse(
         request,
         "resume_preview.html",
@@ -1255,6 +1277,7 @@ def resume_preview_page(
             "profile": profile,
             "educations": educations,
             "experiences": experiences,
+            "show_experience": show_experience,
             "skills": skills,
             "projects": projects,
             "certifications": certifications,
@@ -1299,6 +1322,8 @@ def use_template_page(
     if skills:
         skills["job_role_text"] = get_job_role_text_from_skills(skills)
 
+    show_experience = len(experiences) > 0 and user.get("is_fresher", 0) == 0
+
     return templates.TemplateResponse(
         request,
         "resume_generate.html",
@@ -1308,6 +1333,7 @@ def use_template_page(
             "profile": profile,
             "educations": educations,
             "experiences": experiences,
+            "show_experience": show_experience,
             "skills": skills,
             "projects": projects,
             "certifications": certifications,
@@ -1351,12 +1377,16 @@ def generate_pdf(request: Request):
     if skills:
         skills["job_role_text"] = get_job_role_text_from_skills(skills)
 
+    show_experience = len(experiences) > 0 and user.get("is_fresher", 0) == 0
+    
+
     full_html = templates.get_template("resume_generate.html").render({
         "request": request,
         "user": user,
         "profile": profile,
         "educations": educations,
         "experiences": experiences,
+        "show_experience": show_experience,
         "skills": skills,
         "projects": projects,
         "certifications": certifications,
@@ -1395,9 +1425,10 @@ def generate_pdf(request: Request):
         template_name,
         " ",
         pdf_static_url,
-        
     )
+
     keep_latest_3_resumes(user["id"])
+
     return FileResponse(
         path=str(pdf_path),
         filename=f"{full_name}.pdf",
