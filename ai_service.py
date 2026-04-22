@@ -41,14 +41,15 @@ User draft:
 {user_input}
 
 Instructions:
-- Keep the original meaning.
-- Improve grammar, clarity, and professionalism.
-- Write 4 to 6 bullet points.
-- Start each line with "•".
-- Use action verbs.
-- Make the bullets realistic and resume-friendly.
-- Do not invent fake metrics, fake achievements, or unrealistic claims.
-- Return only the bullet points.
+- Keep the original meaning but improve clarity, grammar, and professionalism.
+- Write a concise paragraph of 2–3 lines (no bullet points).
+- Start with an action-oriented tone (e.g., Developed, Managed, Collaborated, Implemented).
+- Clearly describe responsibilities, tools/technologies used, and contributions.
+- Highlight problem-solving, teamwork, and real-world impact.
+- Use natural, human-like resume language (avoid generic phrases).
+- Do not include fake metrics, fake achievements, or exaggerated claims.
+- Ensure it sounds like real industry experience.
+- Return only the paragraph.
 """
     else:
         prompt = f"""
@@ -63,13 +64,15 @@ Candidate details:
 - Location: {location}
 
 Instructions:
-- Write 4 to 6 bullet points.
-- Start each line with "•".
-- Use action verbs.
-- Make the content realistic and professional.
-- Focus on common responsibilities, collaboration, problem solving, tools, and impact.
-- Do not invent fake metrics, fake achievements, or unrealistic claims.
-- Return only the bullet points.
+- Write a strong professional paragraph of 2–3 lines (no bullet points).
+- Start with an action-oriented tone (e.g., Developed, Managed, Collaborated, Implemented).
+- Describe key responsibilities, tools/technologies used, and daily tasks.
+- Highlight teamwork, problem-solving, and practical contributions.
+- Keep the tone concise, impactful, and resume-ready.
+- Avoid generic phrases like "hardworking" or "responsible for".
+- Do not include fake metrics or unrealistic claims.
+- Ensure it feels like real job experience.
+- Return only the paragraph.
 """
 
     response = client.models.generate_content(
@@ -105,15 +108,15 @@ User draft:
 {user_input}
 
 Instructions:
-- Keep the original meaning.
-- Improve grammar, clarity, and professionalism.
-- Write 3 to 5 bullet points.
-- Start each line with "•".
-- Use action verbs.
-- Make the bullets realistic and resume-friendly.
-- Highlight features, functionality, technologies, and impact.
-- Do not invent fake metrics or unrealistic claims.
-- Return only the bullet points.
+- Keep the original meaning but enhance clarity and professionalism.
+- Write a concise paragraph of 2–3 lines (no bullet points).
+- Start with an action-oriented verb (e.g., Developed, Built, Designed, Implemented).
+- Clearly describe the project purpose, key features, and technologies used.
+- Highlight problem-solving and real-world application.
+- Use natural, human-like resume language (avoid generic phrases).
+- Do not include fake metrics or exaggerated claims.
+- Ensure it sounds like real industry experience.
+- Return only the paragraph.
 """
     else:
         prompt = f"""
@@ -126,13 +129,15 @@ Project details:
 - Technologies Used: {technologies}
 
 Instructions:
-- Write 3 to 5 bullet points.
-- Start each line with "•".
-- Use action verbs.
-- Make the content realistic and professional.
-- Highlight project functionality, user features, technologies used, and problem solving.
-- Do not invent fake metrics or unrealistic claims.
-- Return only the bullet points.
+- Write a strong professional paragraph of 2–3 lines (no bullet points).
+- Start with an action-oriented verb (e.g., Developed, Built, Designed, Implemented).
+- Clearly explain the project purpose, key features, and technologies used.
+- Highlight practical use case, user interaction, and problem solving.
+- Keep the tone concise, impactful, and resume-ready.
+- Avoid generic phrases like "user-friendly" or "innovative solution".
+- Do not include fake metrics or unrealistic claims.
+- Ensure it feels like a real project experience.
+- Return only the paragraph.
 """
 
     response = client.models.generate_content(
@@ -447,7 +452,8 @@ Instructions:
 """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        # model="gemini-2.5-flash",
+       model= "gemini-2.5-flash-lite",
         contents=prompt,
     )
 

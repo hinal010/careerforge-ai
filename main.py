@@ -1,7 +1,7 @@
 import shutil
 from pathlib import Path
 import uuid
-from fastapi import FastAPI, Request, Form, File, UploadFile, Query
+from fastapi import FastAPI, Request, Form, File, UploadFile, Query,BackgroundTasks
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, Response, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -12,6 +12,7 @@ from auth_config import (
     SESSION_SECRET_KEY,
     ADMIN_EMAIL,
     ADMIN_PASSWORD,
+    
     CLIENT_ID,
     CLIENT_SECRET,
     GOOGLE_REDIRECT_URI,
@@ -96,6 +97,7 @@ from ai_service import (
     generate_missing_skills,
     generate_professional_summary,
 )
+from email_service import send_resume_generated_email ,send_welcome_email
 from database import conn
 
 app = FastAPI()
@@ -335,11 +337,11 @@ def keep_latest_3_resumes(user_id: int):
 
         for res in old_resumes:
             # delete files also
-            pdf_path = static_url_to_local_path(res.get("pdf_file", ""))
+            pdf_path = static_url_to_local_path(res["pdf_file"] or "")
             if pdf_path and pdf_path.exists():
                 pdf_path.unlink()
 
-            html_path = static_url_to_local_path(res.get("html_file", ""))
+            html_path = static_url_to_local_path(res["html_file"] or "")
             if html_path and html_path.exists():
                 html_path.unlink()
 
@@ -383,6 +385,7 @@ def register_page(request: Request):
 @app.post("/register")
 def register_user(
     request: Request,
+    background_tasks: BackgroundTasks,
     username: str = Form(...),
     full_name: str = Form(...),
     email: str = Form(...),
@@ -400,7 +403,7 @@ def register_user(
         )
 
     create_user(username, full_name, email, password)
-
+    background_tasks.add_task(send_welcome_email, email, full_name)
     response = RedirectResponse(url="/login?msg=registered", status_code=303)
     response.set_cookie(
         key="known_user",
@@ -1347,7 +1350,7 @@ def use_template_page(
 # generate_pdf
 # =========================================================
 @app.get("/generate_pdf")
-def generate_pdf(request: Request):
+def generate_pdf(request: Request,background_tasks: BackgroundTasks):
     user = require_login(request)
     if isinstance(user, RedirectResponse):
         return user
@@ -1415,6 +1418,17 @@ def generate_pdf(request: Request):
         target=str(pdf_path),
         stylesheets=[CSS(filename=str(css_file))]
     )
+
+    # Send email after PDF is successfully created
+    user_email = request.session.get("user_email")
+    full_name = request.session.get("user_name", "User")
+
+    if user_email:
+        background_tasks.add_task(
+            send_resume_generated_email,
+            user_email,
+            full_name
+        )
 
     pdf_static_url = f"/static/generated_resumes/{pdf_filename}"
     resume_name = profile["full_name"] if profile and profile.get("full_name") else user["full_name"]
