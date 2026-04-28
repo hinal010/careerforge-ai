@@ -106,20 +106,4 @@ Visit: http://127.0.0.1:8000
 4. AI generates optimized resume
 5. Download in your preferred format
 
----
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License.
-
----
-
-## 💬 Support
-
-For questions or issues, please open an issue on GitHub.
