@@ -40,13 +40,48 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4️⃣ Run Backend Server
+### 4️⃣ Configure Environment Variables
+
+Create a `.env` file in the project root directory and add the following environment variables:
+
+```env
+# Google OAuth Configuration
+CLIENT_ID=your_google_client_id
+CLIENT_SECRET=your_google_client_secret
+GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/auth/callback
+
+# JWT Authentication
+SECRET_KEY=your_secret_key_here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+SESSION_SECRET_KEY=your_session_secret_key
+
+# Admin Credentials
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=your_secure_password
+
+# Gemini AI API
+GEMINI_API_KEY=your_gemini_api_key
+
+# Email Configuration
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_email_password_or_app_password
+```
+
+**⚠️ Security Note**: 
+- Never commit `.env` file to version control (it's already in `.gitignore`)
+- Keep your API keys and secrets safe
+- Use environment-specific values for development and production
+
+---
+
+### 5️⃣ Run Backend Server
 
 ```bash
 uvicorn main:app --reload
 ```
 
-### 5️⃣ Open Application
+### 6️⃣ Open Application
 
 Visit: http://127.0.0.1:8000
 
@@ -57,7 +92,9 @@ Visit: http://127.0.0.1:8000
 - **Backend**: Python, FastAPI
 - **Frontend**: HTML, CSS, JavaScript
 - **NLP**: Natural Language Processing
-- **Database**: [Add your DB here]
+- **Authentication**: Google OAuth, JWT
+- **AI/ML**: Google Gemini API
+- **Email**: SMTP Email Service
 
 ---
 
